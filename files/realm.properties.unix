@@ -1,0 +1,3 @@
+# Create MD5 hash with
+# echo -n "<password>" | md5sum
+# on Unix
