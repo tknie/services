@@ -27,6 +27,7 @@ Q = $(if $(filter 1,$V),,@)
 M = $(shell printf "\033[34;1m▶\033[0m")
 
 export TIMEOUT GO CGO_CFLAGS CGO_LDFLAGS GO_FLAGS CGO_EXT_LDFLAGS TESTFILES
+export CURDIR
 
 .PHONY: all
 all: prepare fmt lint lib $(EXECS) test-build
