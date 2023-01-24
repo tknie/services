@@ -1,0 +1,10 @@
+SYS00002=user %s unknown
+SYS00003=not implemented
+SYS00004=user %s already in list
+SYS00005=user %s not found in list
+SYS00006=given PID file %s is a directory
+SYS00007=given PID file %s is already available
+SYS00008=check PID file %s fails: %v
+SYS00029=Error opening server PID file: %s
+RERR00001=Command execution error, got response code %v
+RERR00042=Given config file not found: %v
