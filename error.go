@@ -13,7 +13,6 @@ package services
 
 import (
 	"embed"
-	"fmt"
 	"path"
 
 	"github.com/tknie/errorrepo"
@@ -34,7 +33,6 @@ func init() {
 				panic("Internal config load error: " + err.Error())
 			}
 			lang := path.Ext(f.Name())
-			fmt.Println(lang[1:], string(byteValue))
 			errorrepo.RegisterMessage(lang[1:], string(byteValue))
 		}
 	}
