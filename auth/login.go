@@ -28,8 +28,8 @@ func InitLoginService(auth *Authentication) {
 	if len(auth.AuthenticationServer) == 0 {
 		log.Log.Debugf("No authentication defined, set default Realm")
 		service := &AuthenticationServer{}
-		service.Type = "jaas"
-		service.RealmFile = defaultPasswordFile
+		service.Type = "file"
+		service.PasswordFile = defaultPasswordFile
 
 		auth.AuthenticationServer = append(auth.AuthenticationServer, service)
 	}
@@ -39,9 +39,9 @@ func InitLoginService(auth *Authentication) {
 		s.AuthMethod = MethodType(s.Type)
 		switch s.AuthMethod {
 		case FileMethod:
-			log.Log.Debugf("Authentication(%p): JAAS using password file %s", s, os.ExpandEnv(s.RealmFile))
-			services.ServerMessage("Authentication realm in file %s", os.ExpandEnv(s.RealmFile))
-			InitPasswordFile(s.RealmFile)
+			log.Log.Debugf("Authentication(%p): Auth using password file %s", s, os.ExpandEnv(s.PasswordFile))
+			services.ServerMessage("Authentication realm in file %s", os.ExpandEnv(s.PasswordFile))
+			InitPasswordFile(s.PasswordFile)
 			// go Updater(auth)
 		case SystemMethod:
 			if s.Module == "" {

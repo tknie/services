@@ -41,7 +41,7 @@ func (service *AuthenticationServer) Authenticate(principal PrincipalInterface, 
 	case OpenIDMethod:
 		principal.AddRoles(DefaultRoles)
 		return service.authOpenID(user, passwd)
-	case DatabaseMethod:
+	case SQLDatabaseMethod:
 		principal.AddRoles(DefaultRoles)
 		return PerDatabase(service.Module, user, passwd)
 	default:
@@ -61,8 +61,8 @@ func (authMethod Method) Method() string {
 		return "LDAP"
 	case OpenIDMethod:
 		return "OpenID"
-	case DatabaseMethod:
-		return "Database"
+	case SQLDatabaseMethod:
+		return "SQL"
 	}
 	return "Unknown"
 }

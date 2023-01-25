@@ -47,8 +47,8 @@ const (
 	LDAPMethod
 	// OpenIDMethod OpenID method
 	OpenIDMethod
-	// DatabaseMethod database method
-	DatabaseMethod
+	// SQLDatabaseMethod database method
+	SQLDatabaseMethod
 )
 
 // MethodType parse method type out of string
@@ -61,8 +61,8 @@ func MethodType(s string) Method {
 		return SystemMethod
 	case "openid":
 		return OpenIDMethod
-	case "database":
-		return DatabaseMethod
+	case "SQL":
+		return SQLDatabaseMethod
 	case "ldap":
 		return LDAPMethod
 	}
@@ -76,13 +76,13 @@ type Authentication struct {
 
 // AuthenticationServer authentication server
 type AuthenticationServer struct {
-	Comment    string   `xml:",comment" yaml:"-"`
-	Module     string   `xml:"module,attr" yaml:"module,omitempty"`
-	Type       string   `xml:"type,attr" yaml:"type,omitempty"`
-	AuthMethod Method   `xml:"-" yaml:"-"`
-	Target     string   `xml:"Target,omitempty" yaml:"target,omitempty"`
-	RealmFile  string   `xml:"Realm,omitempty" yaml:"Realm,omitempty"`
-	LDAP       []Source `xml:"LDAP,omitempty" yaml:"LDAP,omitempty"`
+	Comment      string   `xml:",comment" yaml:"-"`
+	Module       string   `xml:"module,attr" yaml:"module,omitempty"`
+	Type         string   `xml:"type,attr" yaml:"type,omitempty"`
+	AuthMethod   Method   `xml:"-" yaml:"-"`
+	Target       string   `xml:"target,omitempty" yaml:"target,omitempty"`
+	PasswordFile string   `xml:"passwordFile,omitempty" yaml:"Realm,omitempty"`
+	LDAP         []Source `xml:"LDAP,omitempty" yaml:"LDAP,omitempty"`
 }
 
 // User REST user
@@ -169,10 +169,6 @@ var AllowedUsers *Users = nil
 // AllowedAdministrators allowed user reading data
 var AllowedAdministrators *Users = nil
 
-func (users *Users) syncUsers() error {
-	return nil
-}
-
 func generatePermisionMap(p string, d map[string]bool) map[string]bool {
 	m := make(map[string]bool)
 	if p == "" {
@@ -253,9 +249,6 @@ func checkUserRole(user, resource string, writeAccess bool) bool {
 				case us.WriteMap["*"]:
 					log.Log.Debugf("All write user set")
 					return true
-				case len(resource) > 0 && resource[0] == '#' && us.WriteMap["#*"]:
-					log.Log.Debugf("All write user set (#)")
-					return true
 				case resource == "" || us.WriteMap[resource]:
 					log.Log.Debugf("Define write map found")
 					return true
@@ -266,9 +259,6 @@ func checkUserRole(user, resource string, writeAccess bool) bool {
 				switch {
 				case us.ReadMap["*"]:
 					log.Log.Debugf("All read user set")
-					return true
-				case len(resource) > 0 && resource[0] == '#' && us.ReadMap["#*"]:
-					log.Log.Debugf("All read user set (#)")
 					return true
 				case resource == "" || us.ReadMap[resource]:
 					log.Log.Debugf("Define read map found")
@@ -284,10 +274,6 @@ func checkUserRole(user, resource string, writeAccess bool) bool {
 			case AllowedUsers.Default.WriteMap["*"]:
 				log.Log.Debugf("All write user set (default) for maps")
 				return true
-			case len(resource) > 0 && resource[0] == '#' &&
-				AllowedUsers.Default.WriteMap["#*"]:
-				log.Log.Debugf("All write user set (default) for ids")
-				return true
 			case AllowedUsers.Default.WriteMap[resource]:
 				log.Log.Debugf("Map write user set (default)")
 				return true
@@ -297,10 +283,6 @@ func checkUserRole(user, resource string, writeAccess bool) bool {
 			log.Log.Debugf("Default check read=%s write=%s resource=%s", AllowedUsers.Default.Read, AllowedUsers.Default.Write, resource)
 			switch {
 			case AllowedUsers.Default.ReadMap["*"]:
-				log.Log.Debugf("All read user set (default)")
-				return true
-			case len(resource) > 0 && resource[0] == '#' &&
-				AllowedUsers.Default.ReadMap["#*"]:
 				log.Log.Debugf("All read user set (default)")
 				return true
 			case AllowedUsers.Default.ReadMap[resource]:
