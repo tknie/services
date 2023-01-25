@@ -82,7 +82,7 @@ type AuthenticationServer struct {
 	Layer        string   `xml:"driver,attr" yaml:"driver,omitempty"`
 	AuthMethod   Method   `xml:"-" yaml:"-"`
 	Target       string   `xml:"target,omitempty" yaml:"target,omitempty"`
-	PasswordFile string   `xml:"passwordFile,omitempty" yaml:"Realm,omitempty"`
+	PasswordFile string   `xml:"passwordFile,omitempty" yaml:"passwordFile,omitempty"`
 	LDAP         []Source `xml:"LDAP,omitempty" yaml:"LDAP,omitempty"`
 }
 

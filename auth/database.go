@@ -20,6 +20,7 @@ var listAuthDatabase = make([]*authDatabase, 0)
 // RegisterTargetForAuth register principal hooks
 func RegisterTargetForAuth(layer, URL, query string) {
 	log.Log.Debugf("Register auth databases: %s/%s", layer, URL)
+	log.Log.Debugf("Query %s", query)
 	listAuthDatabase = append(listAuthDatabase, &authDatabase{layer, URL, query, true})
 }
 
