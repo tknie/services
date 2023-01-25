@@ -41,26 +41,28 @@ const (
 	UnknownMethod Method = iota
 	// SystemMethod System method
 	SystemMethod
-	// PamMethod PAM login method
-	PamMethod
-	// FileMethod Realm method
+	// FileMethod password file method
 	FileMethod
 	// LDAPMethod LDAP method
 	LDAPMethod
 	// OpenIDMethod OpenID method
 	OpenIDMethod
+	// DatabaseMethod database method
+	DatabaseMethod
 )
 
 // MethodType parse method type out of string
 func MethodType(s string) Method {
 	t := strings.ToLower(strings.TrimSpace(s))
 	switch t {
-	case "jaas", "file":
+	case "file":
 		return FileMethod
-	case "pam", "system":
+	case "system":
 		return SystemMethod
 	case "openid":
 		return OpenIDMethod
+	case "database":
+		return DatabaseMethod
 	case "ldap":
 		return LDAPMethod
 	}

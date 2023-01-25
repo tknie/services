@@ -31,7 +31,7 @@ func (service *AuthenticationServer) Authenticate(principal PrincipalInterface, 
 		roles, err := CheckPasswordFileUser(user, passwd)
 		principal.AddRoles(strings.Split(roles, ","))
 		return err
-	case SystemMethod, PamMethod:
+	case SystemMethod:
 		log.Log.Debugf("System service name %s", service.Module)
 		principal.AddRoles(DefaultRoles)
 		return SystemAuthenticate(service.Module, user, passwd)
@@ -41,6 +41,9 @@ func (service *AuthenticationServer) Authenticate(principal PrincipalInterface, 
 	case OpenIDMethod:
 		principal.AddRoles(DefaultRoles)
 		return service.authOpenID(user, passwd)
+	case DatabaseMethod:
+		principal.AddRoles(DefaultRoles)
+		return PerDatabase(service.Module, user, passwd)
 	default:
 		log.Log.Debugf("Unknown service name %s", service.AuthMethod.Method())
 	}
@@ -50,7 +53,7 @@ func (service *AuthenticationServer) Authenticate(principal PrincipalInterface, 
 // Method used authorization method
 func (authMethod Method) Method() string {
 	switch authMethod {
-	case SystemMethod, PamMethod:
+	case SystemMethod:
 		return "System"
 	case FileMethod:
 		return "Realm properties"
@@ -58,12 +61,10 @@ func (authMethod Method) Method() string {
 		return "LDAP"
 	case OpenIDMethod:
 		return "OpenID"
+	case DatabaseMethod:
+		return "Database"
 	}
 	return "Unknown"
-}
-
-func (service *AuthenticationServer) check() {
-	panic("Unknown....")
 }
 
 func (service *AuthenticationServer) authLDAPRealm(u, password string) error {

@@ -21,6 +21,7 @@ GODOC       = godoc
 TIMEOUT     = 2000
 TESTFILES   = $(CURDIR)/files
 GOEXE      ?= $(shell $(GO) env GOEXE)
+TEST_RUN    = $(if $(TEST),-test.run $(TEST),)
 
 V = 0
 Q = $(if $(filter 1,$V),,@)
@@ -139,7 +140,7 @@ check test tests: fmt lint ; $(info $(M) running $(NAME:%=% )tests…) @ ## Run 
 		DYLD_LIBRARY_PATH="$(DYLD_LIBRARY_PATH):$(ACLDIR)/lib" \
 	    CGO_CFLAGS="$(CGO_CFLAGS)" CGO_LDFLAGS="$(CGO_LDFLAGS) $(CGO_EXT_LDFLAGS)" \
 	    TESTFILES=$(TESTFILES) GO_ADA_MESSAGES=$(MESSAGES) CURDIR=$(CURDIR) LOGPATH=$(LOGPATH) REFERENCES=$(REFERENCES) \
-	    $(GO) test -timeout $(TIMEOUT)s $(GO_TAGS) $(ARGS) ./...
+	    $(GO) test -timeout $(TIMEOUT)s $(TEST_RUN) $(GO_TAGS) $(ARGS) ./...
 
 TEST_XML_TARGETS := test-xml-bench
 .PHONY: $(TEST_XML_TARGETS) test-xml

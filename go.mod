@@ -20,12 +20,19 @@ require (
 )
 
 require (
+	github.com/jackc/pgpassfile v1.0.0 // indirect
+	github.com/jackc/pgservicefile v0.0.0-20200714003250-2b9c44734f2b // indirect
+)
+
+require (
 	github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358 // indirect
 	github.com/BurntSushi/toml v1.2.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-asn1-ber/asn1-ber v1.5.4 // indirect
+	github.com/go-sql-driver/mysql v1.7.0
 	github.com/go-yaml/yaml v2.1.0+incompatible
 	github.com/google/go-cmp v0.5.9 // indirect
+	github.com/jackc/pgx/v5 v5.2.0
 	github.com/msteinert/pam v1.1.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
