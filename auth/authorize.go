@@ -61,7 +61,7 @@ func MethodType(s string) Method {
 		return SystemMethod
 	case "openid":
 		return OpenIDMethod
-	case "SQL":
+	case "sql":
 		return SQLDatabaseMethod
 	case "ldap":
 		return LDAPMethod
