@@ -79,6 +79,7 @@ type AuthenticationServer struct {
 	Comment      string   `xml:",comment" yaml:"-"`
 	Module       string   `xml:"module,attr" yaml:"module,omitempty"`
 	Type         string   `xml:"type,attr" yaml:"type,omitempty"`
+	Layer        string   `xml:"layer,attr" yaml:"layer,omitempty"`
 	AuthMethod   Method   `xml:"-" yaml:"-"`
 	Target       string   `xml:"target,omitempty" yaml:"target,omitempty"`
 	PasswordFile string   `xml:"passwordFile,omitempty" yaml:"Realm,omitempty"`
