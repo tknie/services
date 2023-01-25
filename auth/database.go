@@ -3,6 +3,7 @@ package auth
 import (
 	"database/sql"
 	"errors"
+	"os"
 	"strings"
 
 	"github.com/tknie/log"
@@ -34,7 +35,7 @@ func RegisterDatabaseForAuth(layer, URL, query string) {
 func PerDatabase(dbName, userName, passwd string) error {
 	log.Log.Debugf("Check %d auth databases", len(listAuthDatabase))
 	for _, ad := range listAuthDatabase {
-		adaptURL := ad.URL
+		adaptURL := os.ExpandEnv(ad.URL)
 		if userName != "" {
 			adaptURL = strings.Replace(adaptURL, "<user>", userName, -1)
 		}
