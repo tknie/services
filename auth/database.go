@@ -46,12 +46,14 @@ func PerDatabase(dbName, userName, passwd string) error {
 
 // check create short test database connection
 func (adb *authDatabase) check(URL string) error {
+	log.Log.Debugf("Check on layer %s: %s", adb.layer, URL)
 	db, err := sql.Open(adb.layer, URL)
 	if err != nil {
 		return err
 	}
 	defer db.Close()
 
+	log.Log.Debugf("Auth query: %s", adb.query)
 	_, err = db.Query(adb.query)
 	if err != nil {
 		return err
