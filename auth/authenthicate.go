@@ -27,7 +27,7 @@ func (service *AuthenticationServer) Authenticate(principal PrincipalInterface, 
 	log.Log.Debugf("Authenticate: %p -> %d", service, service.AuthMethod)
 	switch service.AuthMethod {
 	case FileMethod:
-		log.Log.Debugf("Realm service user %s", user)
+		log.Log.Debugf("Password file service user %s", user)
 		roles, err := CheckPasswordFileUser(user, passwd)
 		principal.AddRoles(strings.Split(roles, ","))
 		return err
@@ -43,6 +43,7 @@ func (service *AuthenticationServer) Authenticate(principal PrincipalInterface, 
 		return service.authOpenID(user, passwd)
 	case SQLDatabaseMethod:
 		principal.AddRoles(DefaultRoles)
+		log.Log.Debugf("SQL database service name %s", service.Module)
 		return PerDatabase(service.Module, user, passwd)
 	default:
 		log.Log.Debugf("Unknown service name %s", service.AuthMethod.Method())

@@ -19,11 +19,13 @@ var listAuthDatabase = make([]*authDatabase, 0)
 
 // RegisterDatabaseForAuth register principal hooks
 func RegisterDatabaseForAuth(layer, URL, query string) {
+	log.Log.Debugf("Register auth databases: %s/%s", layer, URL)
 	listAuthDatabase = append(listAuthDatabase, &authDatabase{layer, URL, query, true})
 }
 
 // PerDatabase authenticate user and password to database
 func PerDatabase(dbName, userName, passwd string) error {
+	log.Log.Debugf("Check %d auth databases", len(listAuthDatabase))
 	for _, ad := range listAuthDatabase {
 		adaptURL := ad.URL
 		if userName != "" {
