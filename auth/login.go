@@ -52,6 +52,8 @@ func InitLoginService(auth *Authentication) {
 			services.ServerMessage("Authentication using OpenID Connect")
 		case LDAPMethod:
 			services.ServerMessage("Authentication using LDAP server")
+		case SQLDatabaseMethod:
+			services.ServerMessage("Authentication using SQL database")
 		default:
 			panic("Error faulty authentication method: " + s.Type)
 		}
