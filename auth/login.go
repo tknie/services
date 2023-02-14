@@ -21,7 +21,7 @@ import (
 var defaultPasswordFile = "configuration/auth.passwords"
 
 // InitLoginService init login service realm and authorization instances of user
-func InitLoginService(auth *Authentication) {
+func InitLoginService(auth *Authentication) error {
 	log.Log.Debugf("Init login service")
 
 	// Check configuration values and set defaults
@@ -41,7 +41,10 @@ func InitLoginService(auth *Authentication) {
 		case FileMethod:
 			log.Log.Debugf("Authentication(%p): Auth using password file %s", s, os.ExpandEnv(s.PasswordFile))
 			services.ServerMessage("Authentication realm in file %s", os.ExpandEnv(s.PasswordFile))
-			InitPasswordFile(s.PasswordFile)
+			err := InitPasswordFile(s.PasswordFile)
+			if err != nil {
+				return err
+			}
 			// go Updater(auth)
 		case SystemMethod:
 			if s.Module == "" {
@@ -57,6 +60,29 @@ func InitLoginService(auth *Authentication) {
 			RegisterTargetForAuth(s.Layer, s.Target, s.Module)
 		default:
 			panic("Error faulty authentication method: " + s.Type)
+		}
+	}
+	return nil
+}
+
+// RemoveLoginService remove login service realm and authorization instances of user
+func RemoveLoginService(auth *Authentication) {
+	log.Log.Debugf("Init login service")
+
+	// Check configuration values and set defaults
+	if len(auth.AuthenticationServer) == 0 {
+		return
+	}
+	// Go through all login authentication services and activate them
+	for _, s := range auth.AuthenticationServer {
+		log.Log.Debugf("Remove authentication type <%s>", s.Type)
+		s.AuthMethod = MethodType(s.Type)
+		switch s.AuthMethod {
+		case FileMethod:
+			RemovePasswordFile(s.PasswordFile)
+			services.ServerMessage("Remove Authentication password file type")
+		default:
+			log.Log.Debugf("Remove of authentication type %s not possible", s.Type)
 		}
 	}
 }

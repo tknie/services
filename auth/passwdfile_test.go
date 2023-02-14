@@ -15,7 +15,10 @@ func TestRealmUnix(t *testing.T) {
 		return
 	}
 	realmFile := os.ExpandEnv("${CURDIR}/files/auth.passwords.unix")
-	rfs := NewInitFileRealm(realmFile, false)
+	rfs, err := NewInitFileRealm(realmFile, false)
+	if !assert.NoError(t, err) {
+		return
+	}
 	if !assert.NotNil(t, rfs) {
 		return
 	}
@@ -54,7 +57,10 @@ func TestRealmWindows(t *testing.T) {
 		return
 	}
 	realmFile := os.ExpandEnv("${CURDIR}/files/auth.passwords.win")
-	rfs := NewInitFileRealm(realmFile, false)
+	rfs, err := NewInitFileRealm(realmFile, false)
+	if !assert.NoError(t, err) {
+		return
+	}
 	if !assert.NotNil(t, rfs) {
 		return
 	}
@@ -81,13 +87,16 @@ func TestRealmWindows(t *testing.T) {
 
 func TestRealmVirtual(t *testing.T) {
 	os.Remove("/tmp/realm.file.test.restgo")
-	rfs := NewInitFileRealm("/tmp/realm.file.test.restgo", false)
+	rfs, err := NewInitFileRealm("/tmp/realm.file.test.restgo", false)
+	if !assert.NoError(t, err) {
+		return
+	}
 	if !assert.NotNil(t, rfs) {
 		return
 	}
 	rfs.AppendUserToPasswordFile("test", "manage123", "sagadmin, aifadmin, jobadmin,fileadmin")
 	// 22d16eba32c4cb0ebf725ba4b7e6da35cc6dda9dab12d597d8b8c0ed8fe368d9cef4e6e5cf4b1a8fcab92db90a27f8f9788a2c0138ad3afc4fc83eb4c489e92c
-	err := rfs.FlushUserToPasswordFile()
+	err = rfs.FlushUserToPasswordFile()
 	assert.NoError(t, err)
 	err = rfs.scan()
 	assert.NoError(t, err)
