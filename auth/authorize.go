@@ -57,7 +57,7 @@ func MethodType(s string) Method {
 	switch t {
 	case "file":
 		return FileMethod
-	case "system":
+	case "system", "pam":
 		return SystemMethod
 	case "openid":
 		return OpenIDMethod

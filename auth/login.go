@@ -67,7 +67,7 @@ func InitLoginService(auth *Authentication) error {
 
 // RemoveLoginService remove login service realm and authorization instances of user
 func RemoveLoginService(auth *Authentication) {
-	log.Log.Debugf("Init login service")
+	log.Log.Debugf("Remove login service")
 
 	// Check configuration values and set defaults
 	if len(auth.AuthenticationServer) == 0 {

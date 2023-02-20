@@ -107,7 +107,7 @@ func cleanUp(nowTime time.Time) {
 			if WebTokenConfig.Expirer > 0 {
 				elapsed := authData.created.Add(expirer)
 				if log.IsDebugLevel() {
-					log.Log.Debugf("Check hash %s elapsed at %v", uuid, elapsed)
+					log.Log.Debugf("Cleanup: check hash %s elapsed at %v", uuid, elapsed)
 				}
 				if !elapsed.After(nowTime) {
 					log.Log.Infof("Remove expired UUID %s at %v", uuid, elapsed)
