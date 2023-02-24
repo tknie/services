@@ -40,7 +40,7 @@ var (
 type WebToken struct {
 	Comment    string `xml:",comment" yaml:"-"`
 	IssuerName string `xml:"issuer,attr" yaml:"issuer,omitempty"`
-	Expirer    int    `xml:"expire,attr" yaml:"expire,omitempty"`
+	Expirer    string `xml:"expire,attr" yaml:"expire,omitempty"`
 	Encrypt    bool   `xml:"encrypt,attr" yaml:"encrypt,omitempty"`
 	PublicKey  string `xml:"PublicKey" yaml:"publicKey,omitempty"`
 	PrivateKey string `xml:"PrivateKey" yaml:"privateKey,omitempty"`
@@ -73,6 +73,7 @@ type roleClaimsJose2 struct {
 
 // WebTokenConfig web token JWT configuration
 var WebTokenConfig *WebToken
+var sessionExpirerDuration = time.Duration(6) * time.Hour
 
 // var privateKeyJose2 *jose.JSONWebSignature
 // var rsaPrivateKeyPassword = ""
@@ -85,6 +86,9 @@ func init() {
 }
 
 func cleanUpTicker() {
+	if log.IsDebugLevel() {
+		log.Log.Debugf("UUID session cleanup thread started, session expires after %v", sessionExpirerDuration)
+	}
 	for {
 		select {
 		case <-doneTicker:
@@ -100,19 +104,17 @@ func cleanUpTicker() {
 func cleanUp(nowTime time.Time) {
 	uuidLock.Lock()
 	defer uuidLock.Unlock()
-	if WebTokenConfig != nil &&
-		WebTokenConfig.Expirer > 0 {
-		expirer := time.Duration(WebTokenConfig.Expirer) * time.Minute
+	if WebTokenConfig != nil {
+		expirer, err := time.ParseDuration(WebTokenConfig.Expirer)
+		if err != nil {
+		} else {
+			sessionExpirerDuration = expirer
+		}
 		for uuid, authData := range uuidHash {
-			if WebTokenConfig.Expirer > 0 {
-				elapsed := authData.created.Add(expirer)
-				if log.IsDebugLevel() {
-					log.Log.Debugf("Cleanup: check hash %s elapsed at %v", uuid, elapsed)
-				}
-				if !elapsed.After(nowTime) {
-					log.Log.Infof("Remove expired UUID %s at %v", uuid, elapsed)
-					delete(uuidHash, uuid)
-				}
+			elapsed := authData.created.Add(sessionExpirerDuration)
+			if !elapsed.After(nowTime) {
+				log.Log.Infof("Remove expired UUID %s at %v", uuid, elapsed)
+				delete(uuidHash, uuid)
 			}
 		}
 	}
@@ -250,7 +252,7 @@ func (webToken *WebToken) GenerateJWToken(IAt string, principal PrincipalInterfa
 		log.Log.Debugf("Generate token -> Principal %s: %#v", principal.Name, principal.Roles)
 	}
 	claim.UUID = principal.UUID()
-	claim.ExpiresAt = jwt.NewNumericDate(time.Now().Add(time.Hour * time.Duration(webToken.Expirer)))
+	claim.ExpiresAt = jwt.NewNumericDate(time.Now().Add(sessionExpirerDuration))
 	if webToken != nil {
 		claim.Issuer = webToken.IssuerName
 	} else {
@@ -386,20 +388,20 @@ func (webToken *WebToken) JWTContainsRoles(token string, scopes []string) (Princ
 				return p, nil
 			}
 			if log.IsDebugLevel() {
-				log.Log.Debugf("UUID %s not found", claims.UUID)
+				log.Log.Debugf("UUID %s not found for %s", claims.UUID, claims.ID)
 			}
-			services.ServerMessage(fmt.Sprintf("Token error, UUID not found: %s", issuer))
+			services.ServerMessage("Token error, UUID issuer %s for %s not found", issuer, claims.ID)
 			return nil, errors.New(http.StatusUnauthorized, "Unauthorized..")
 		}
 		if log.IsDebugLevel() {
 			log.Log.Debugf("Issuer error: %s != %s", claims.Issuer, issuer)
 		}
-		services.ServerMessage(fmt.Sprintf("Unauthorized token (Issuer error): %s", WebTokenConfig.IssuerName))
+		services.ServerMessage("Unauthorized token (Issuer error): %s", WebTokenConfig.IssuerName)
 	} else {
 		if log.IsDebugLevel() {
 			log.Log.Debugf("Claim error")
 		}
-		services.ServerMessage(fmt.Sprintf("Unauthorized token (Claim error): %v", err))
+		services.ServerMessage("Unauthorized token (Claim error): %v", err)
 	}
 	return nil, errors.New(http.StatusUnauthorized, "Unauthorized: invalid Bearer token: %v", err)
 }
