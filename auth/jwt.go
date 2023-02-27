@@ -249,7 +249,7 @@ func (webToken *WebToken) GenerateJWToken(IAt string, principal PrincipalInterfa
 
 	claim := roleClaimsJose2{Roles: principal.Roles(), ID: principal.Name(), Subject: "RestServer", IAt: IAt}
 	if log.IsDebugLevel() {
-		log.Log.Debugf("Generate token -> Principal %s: %#v", principal.Name, principal.Roles)
+		log.Log.Debugf("Generate token -> Principal %s: %#v", principal.Name(), principal.Roles())
 	}
 	claim.UUID = principal.UUID()
 	claim.ExpiresAt = jwt.NewNumericDate(time.Now().Add(sessionExpirerDuration))
