@@ -28,11 +28,11 @@ func TestDatabasePostgresAuth(t *testing.T) {
 
 	RegisterDatabaseForAuth("pgx", pg, "SELECT 1")
 
-	err = PerDatabase("Bitgarten", "admin", postgresPassword)
+	err = PerDatabase("bitgarten", "admin", postgresPassword)
 	if !assert.NoError(t, err) {
 		fmt.Println("Unwantend error:", err)
 	}
-	err = PerDatabase("Bitgarten", "admin", "xxx")
+	err = PerDatabase("bitgarten", "admin", "xxx")
 	assert.Error(t, err)
 	assert.Equal(t, "password authentication failed for user", err.Error())
 
