@@ -22,7 +22,7 @@ func (svc *SVC) Run(env *service.Parameters) error {
 	}
 	//arg := []string{"server"}
 	// return env.Execute(execCommand, arg)
-	return fmt.Errorf("Error running service")
+	return fmt.Errorf("error running service")
 }
 
 // Shutdown shutdown service
@@ -34,7 +34,7 @@ func (svc *SVC) Shutdown(env *service.Parameters) error {
 	}
 	// arg := []string{"client", "-s"}
 	// return env.Execute(execCommand, arg)
-	return fmt.Errorf("Error shutdown service")
+	return fmt.Errorf("error shutdown service")
 }
 
 func main() {

@@ -2,7 +2,6 @@ package auth
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"testing"
@@ -13,14 +12,14 @@ import (
 
 func TestLoginBasic(t *testing.T) {
 	initLog("login.out")
-	file, err := ioutil.TempFile("/tmp", "test.auth.*.file")
+	file, err := os.CreateTemp("/tmp", "test.auth.*.file")
 	if err != nil {
 		log.Fatal(err)
 	}
 	os.Remove(file.Name())
 	defer os.Remove(file.Name())
 	fmt.Println("Realm file:", file.Name())
-	as := &Authentication{AuthenticationServer: []*AuthenticationServer{&AuthenticationServer{Type: "file", PasswordFile: file.Name()}}}
+	as := &Authentication{AuthenticationServer: []*AuthenticationServer{{Type: "file", PasswordFile: file.Name()}}}
 	err = InitLoginService(as)
 	assert.NoError(t, err)
 	nrUsers := CountLoginUser(as.AuthenticationServer[0].PasswordFile)
@@ -33,7 +32,7 @@ func TestLoginBasic(t *testing.T) {
 
 func TestLoginWatcher(t *testing.T) {
 	initLog("login.out")
-	file, err := ioutil.TempFile("/tmp", "test.auth.*.file")
+	file, err := os.CreateTemp("/tmp", "test.auth.*.file")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -41,7 +40,7 @@ func TestLoginWatcher(t *testing.T) {
 	os.Remove(file.Name())
 	//defer os.Remove(file.Name())
 	fmt.Println("Realm file:", file.Name())
-	as := &Authentication{AuthenticationServer: []*AuthenticationServer{&AuthenticationServer{Type: "file", PasswordFile: file.Name()}}}
+	as := &Authentication{AuthenticationServer: []*AuthenticationServer{{Type: "file", PasswordFile: file.Name()}}}
 	err = InitLoginService(as)
 	assert.NoError(t, err)
 	extraUser := fmt.Sprintf("%s: SHA512:%s, user", "tkn", genPwd())

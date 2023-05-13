@@ -78,14 +78,12 @@ func CreatePidFile(flagPidFile string) error {
 	ServerMessage("Creating PID file for server pid=%d", pid)
 	fmt.Fprintf(rf, "%d"+LineBreak, pid)
 
-	c := make(chan os.Signal)
+	c := make(chan os.Signal, 3)
 	signal.Notify(c, handleSignal...)
 	// signal.Notify(c, os.Kill, os.Interrupt)
 	go func() {
-		select {
-		case <-c: // sig := <-c:
-			DeletePidFile(flagPidFile)
-		}
+		<-c // sig := <-c:
+		DeletePidFile(flagPidFile)
 	}()
 
 	return nil
@@ -126,7 +124,7 @@ func ReadPidFile(flagPidFile string) (int, error) {
 		if line != "" {
 			pid, err = strconv.Atoi(line)
 			if err != nil {
-				return 0, fmt.Errorf("Error reading server PID: %v", err)
+				return 0, fmt.Errorf("error reading server PID: %v", err)
 			}
 			break
 		}

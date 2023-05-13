@@ -255,7 +255,7 @@ func (rfs *PasswordFileStruct) readFile(lineBreak string) (err error) {
 			services.ServerMessage("Error writing file %s: %v", rfs.realmFile, err)
 			return err
 		}
-		lineBuffer = lineBuffer + string(buffer.Bytes())
+		lineBuffer = lineBuffer + buffer.String()
 		n := strings.IndexAny(lineBuffer, lineBreak)
 		if n > 0 {
 			count += rfs.parseLine(lineBuffer[:n])

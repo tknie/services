@@ -17,7 +17,6 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"sync"
@@ -114,6 +113,8 @@ func cleanUp(nowTime time.Time) {
 			elapsed := authData.created.Add(sessionExpirerDuration)
 			if !elapsed.After(nowTime) {
 				log.Log.Infof("Remove expired UUID %s at %v", uuid, elapsed)
+				services.ServerMessage("UUID %s expired for user %s", uuid, authData.user)
+
 				delete(uuidHash, uuid)
 			}
 		}
@@ -197,7 +198,7 @@ func (webToken *WebToken) InitWebTokenJose2() error {
 		WebTokenConfig = webToken
 
 		// loads public keys to verify our tokens
-		privateKeyBuf, err := ioutil.ReadFile(os.ExpandEnv(webToken.PrivateKey))
+		privateKeyBuf, err := os.ReadFile(os.ExpandEnv(webToken.PrivateKey))
 		if err != nil {
 			return fmt.Errorf("cannot load private key for tokens needed for JWT %s: %v", webToken.PrivateKey, err)
 		}
@@ -207,7 +208,7 @@ func (webToken *WebToken) InitWebTokenJose2() error {
 		}
 
 		// loads public keys to verify our tokens
-		verifyKeyBuf, err := ioutil.ReadFile(os.ExpandEnv(webToken.PublicKey))
+		verifyKeyBuf, err := os.ReadFile(os.ExpandEnv(webToken.PublicKey))
 		if err != nil {
 			return fmt.Errorf("cannot load public key for tokens needed for JWT")
 		}

@@ -14,7 +14,7 @@ package service
 import (
 	"encoding/xml"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"os/exec"
 	"os/user"
@@ -106,7 +106,7 @@ func (env *Parameters) ParseInstallXML(fileName string) error {
 	if err != nil {
 		return err
 	}
-	byteValue, rerr := ioutil.ReadAll(file)
+	byteValue, rerr := io.ReadAll(file)
 	if rerr != nil {
 		services.ServerMessage("Error reading jobs persistents:", rerr)
 		return rerr
@@ -227,7 +227,7 @@ func (env *Parameters) AdaptConfigure(name string) error {
 		return err
 	}
 	defer f.Close()
-	d, err := ioutil.ReadAll(f)
+	d, err := io.ReadAll(f)
 	if err != nil {
 		return err
 	}

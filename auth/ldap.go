@@ -118,7 +118,7 @@ func (src *Source) findUserDN(l *ldap.Conn, name string) (string, bool, error) {
 	// A search for the user.
 	userFilter, ok := src.sanitizedUserQuery(name)
 	if !ok {
-		return "", false, fmt.Errorf("Sanitize user query %s", name)
+		return "", false, fmt.Errorf("sanitize user query %s", name)
 	}
 
 	log.Log.Debugf("Searching for DN using filter %s and base %s", userFilter, src.UserBase)
@@ -133,13 +133,13 @@ func (src *Source) findUserDN(l *ldap.Conn, name string) (string, bool, error) {
 		return "", false, err
 	} else if len(sr.Entries) > 1 {
 		log.Log.Debugf("Filter '%s' returned more than one user.", userFilter)
-		return "", false, fmt.Errorf("Filter don't return unique entry")
+		return "", false, fmt.Errorf("filter don't return unique entry")
 	}
 
 	userDN := sr.Entries[0].DN
 	if userDN == "" {
 		log.Log.Errorf("LDAP search was successful, but found no DN!")
-		return "", false, fmt.Errorf("No DN found")
+		return "", false, fmt.Errorf("no DN found")
 	}
 
 	return userDN, true, nil
@@ -158,7 +158,7 @@ func dial(ls *Source) (*ldap.Conn, error) {
 
 	conn, err := ldap.Dial("tcp", fmt.Sprintf("%s:%d", ls.Host, ls.Port))
 	if err != nil {
-		return nil, fmt.Errorf("Dial: %v", err)
+		return nil, fmt.Errorf("dial: %v", err)
 	}
 
 	if ls.SecurityProtocol == SecurityProtocolStartTLS {
@@ -235,7 +235,7 @@ func (src *Source) SearchEntry(name, passwd string, directBind bool) (*SearchRes
 	// See https://tools.ietf.org/search/rfc4513#section-5.1.2
 	if len(passwd) == 0 {
 		log.Log.Debugf("Auth. failed for %s, password cannot be empty", name)
-		return nil, fmt.Errorf("Password empty")
+		return nil, fmt.Errorf("password empty")
 	}
 	lConn, err := dial(src)
 	if err != nil {
@@ -253,7 +253,7 @@ func (src *Source) SearchEntry(name, passwd string, directBind bool) (*SearchRes
 		userDN, ok = src.sanitizedUserDN(name)
 
 		if !ok {
-			return nil, fmt.Errorf("Sanitize User DN error")
+			return nil, fmt.Errorf("sanitize User DN error")
 		}
 
 		err = bindUser(lConn, userDN, passwd)
@@ -270,7 +270,7 @@ func (src *Source) SearchEntry(name, passwd string, directBind bool) (*SearchRes
 				return nil, err
 			}
 			if !ok {
-				return nil, fmt.Errorf("Find user DN error: %s", name)
+				return nil, fmt.Errorf("find user DN error: %s", name)
 			}
 		}
 	} else {
@@ -293,7 +293,7 @@ func (src *Source) SearchEntry(name, passwd string, directBind bool) (*SearchRes
 			return nil, err
 		}
 		if !found {
-			return nil, fmt.Errorf("Not found any User DN %s", name)
+			return nil, fmt.Errorf("not found any User DN %s", name)
 		}
 	}
 
@@ -307,7 +307,7 @@ func (src *Source) SearchEntry(name, passwd string, directBind bool) (*SearchRes
 
 	userFilter, ok := src.sanitizedUserQuery(name)
 	if !ok {
-		return nil, fmt.Errorf("Sanitize user query error")
+		return nil, fmt.Errorf("sanitize user query error")
 	}
 
 	attribs := []string{src.AttributeUsername, src.AttributeName, src.AttributeSurname, src.AttributeMail}
@@ -344,11 +344,11 @@ func (src *Source) SearchEntry(name, passwd string, directBind bool) (*SearchRes
 	if src.GroupsEnabled {
 		groupFilter, ok := src.sanitizedGroupFilter(src.GroupFilter)
 		if !ok {
-			return nil, fmt.Errorf("Error sanitized group filter")
+			return nil, fmt.Errorf("error sanitized group filter")
 		}
 		groupDN, ok := src.sanitizedGroupDN(src.GroupDN)
 		if !ok {
-			return nil, fmt.Errorf("Error sanitized group DN")
+			return nil, fmt.Errorf("error sanitized group DN")
 		}
 
 		log.Log.Debugf("Fetching groups '%v' with filter '%s' and base '%s'", src.GroupMemberUID, groupFilter, groupDN)
@@ -363,7 +363,7 @@ func (src *Source) SearchEntry(name, passwd string, directBind bool) (*SearchRes
 			return nil, err
 		} else if len(srg.Entries) < 1 {
 			log.Log.Errorf("LDAP group search failed: 0 entries")
-			return nil, fmt.Errorf("Error group search empty")
+			return nil, fmt.Errorf("error group search empty")
 		}
 
 		isMember := false
@@ -379,7 +379,7 @@ func (src *Source) SearchEntry(name, passwd string, directBind bool) (*SearchRes
 
 		if !isMember {
 			log.Log.Errorf("LDAP group membership test failed")
-			return nil, fmt.Errorf("Is no member")
+			return nil, fmt.Errorf("is no member")
 		}
 	}
 

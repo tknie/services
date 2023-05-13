@@ -32,7 +32,7 @@ func SystemAuthenticate(pamName, userName, passwd string) error {
 			return "", nil
 		}
 		log.Log.Debugf("Unrecognized PAM message style: %d", s)
-		return "", errors.New("Unrecognized PAM message style")
+		return "", errors.New("unrecognized PAM message style")
 	})
 
 	if err != nil {
