@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Users>
+  <!--
+    This configuration file defines administration permission per user.
+    Each 'User' defined below the 'Users' tag has administration rights.
+    This includes Adabas administration operations and the user can
+    control job tasks.
+    Because of security reason this file is not update through the 
+    RESTful API
+  -->
+  <User name="admin" />
+  <User name="tkn" />
+</Users>
