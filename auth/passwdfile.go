@@ -13,14 +13,12 @@ package auth
 
 import (
 	"bufio"
-	"bytes"
 	"crypto/md5"
 	"crypto/sha1"
 	"crypto/sha256"
 	"crypto/sha512"
 	"errors"
 	"fmt"
-	"io"
 	"os"
 	"runtime"
 	"sort"
@@ -227,44 +225,44 @@ func (rfs *PasswordFileStruct) scan() (err error) {
 		services.ServerMessage("Error scanning realm file %s after %d read: %v", rfs.realmFile, count, err)
 		return
 	}
-	services.ServerMessage("Found %d users in realm file", rfs.CountLoginUser())
+	services.ServerMessage("Found %d user(s) in realm file", rfs.CountLoginUser())
 	return
 }
 
-func (rfs *PasswordFileStruct) readFile(lineBreak string) (err error) {
-	b := make([]byte, 4096)
-	var buffer bytes.Buffer
-	var read int
-	count := 0
-	lineBuffer := ""
-	_, err = rfs.realmFd.Seek(0, 0)
-	if err != nil {
-		return
-	}
-	for err != io.EOF {
-		read, err = rfs.realmFd.Read(b)
-		if err == io.EOF {
-			return nil
-		}
-		if err != nil {
-			services.ServerMessage("Error scanning file %s after %d read: %v", rfs.realmFile, count, err)
-			return
-		}
-		_, err = buffer.Write(b[:read])
-		if err != nil {
-			services.ServerMessage("Error writing file %s: %v", rfs.realmFile, err)
-			return err
-		}
-		lineBuffer = lineBuffer + buffer.String()
-		n := strings.IndexAny(lineBuffer, lineBreak)
-		if n > 0 {
-			count += rfs.parseLine(lineBuffer[:n])
-			lineBuffer = lineBuffer[n:]
-		}
-	}
-	services.ServerMessage("Read %d new entries of file %s", count, rfs.realmFile)
-	return
-}
+// func (rfs *PasswordFileStruct) readFile(lineBreak string) (err error) {
+// 	b := make([]byte, 4096)
+// 	var buffer bytes.Buffer
+// 	var read int
+// 	count := 0
+// 	lineBuffer := ""
+// 	_, err = rfs.realmFd.Seek(0, 0)
+// 	if err != nil {
+// 		return
+// 	}
+// 	for err != io.EOF {
+// 		read, err = rfs.realmFd.Read(b)
+// 		if err == io.EOF {
+// 			return nil
+// 		}
+// 		if err != nil {
+// 			services.ServerMessage("Error scanning file %s after %d read: %v", rfs.realmFile, count, err)
+// 			return
+// 		}
+// 		_, err = buffer.Write(b[:read])
+// 		if err != nil {
+// 			services.ServerMessage("Error writing file %s: %v", rfs.realmFile, err)
+// 			return err
+// 		}
+// 		lineBuffer = lineBuffer + buffer.String()
+// 		n := strings.IndexAny(lineBuffer, lineBreak)
+// 		if n > 0 {
+// 			count += rfs.parseLine(lineBuffer[:n])
+// 			lineBuffer = lineBuffer[n:]
+// 		}
+// 	}
+// 	services.ServerMessage("Read %d new entries of file %s", count, rfs.realmFile)
+// 	return
+// }
 
 // parseLine and return count of new entries parsed
 func (rfs *PasswordFileStruct) parseLine(line string) int {
