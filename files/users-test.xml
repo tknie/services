@@ -8,7 +8,7 @@
     Default contains all standard default configuration.
     Entries are comma separated. The entries started with the # are database id
     entries. 
-    - '*' means all Adabas Maps are accessable
+    - '*' means all tables and views are accessable
     - '#*' means all database id's are accessable
     - '!secret_table' means exclude access to secret_table
     - The write tag defines update, delete and store permissions
