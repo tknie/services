@@ -58,6 +58,18 @@ func InitLoginService(auth *Authentication) error {
 		case SQLDatabaseMethod:
 			services.ServerMessage("Authentication using SQL database")
 			RegisterTargetForAuth(s.Layer, s.Target, s.Module)
+		case PluginMethod:
+			services.ServerMessage("Authentication using plugin database")
+			err := CallbackInit(s)
+			if err != nil {
+				return err
+			}
+		case CallbackMethod:
+			services.ServerMessage("Authentication using callback database")
+			err := CallbackInit(s)
+			if err != nil {
+				return err
+			}
 		default:
 			panic("Error faulty authentication method: " + s.Type)
 		}

@@ -15,7 +15,8 @@ TESTPKGS    = $(shell env GOPATH=$(CURDIR) $(GO) list -f '{{ if or .TestGoFiles 
 #CGO_EXT_LDFLAGS = $(if $(ACLDIR),-lsagsmp2 -lsagxts3 -ladazbuf,)
 #GO_TAGS     = $(if $(ACLDIR),"adalnk","release")
 GO_TAGS     = 
-GO_FLAGS    = $(if $(debug),"-x",) $(GO_TAGS)
+GO_FLAGS    = $(if $(debug),"-x",) $(GO_TAGS) 
+#-trimpath 
 GO          = go
 GODOC       = godoc
 TIMEOUT     = 2000
@@ -31,27 +32,37 @@ export TIMEOUT GO CGO_CFLAGS CGO_LDFLAGS GO_FLAGS CGO_EXT_LDFLAGS TESTFILES
 export CURDIR
 
 .PHONY: all
-all: prepare fmt lint lib $(EXECS) test-build
+all: prepare fmt lint lib $(EXECS) $(PLUGINS) test-build
 
 exec: $(EXECS)
 
 lib: $(LIBS) $(CEXEC)
 
-prepare: $(LOGPATH) $(CURLOGPATH) $(BIN) $(BINTOOLS)
+plugins: $(PLUGINS)
+
+prepare: $(LOGPATH) $(CURLOGPATH) $(BIN) $(BINTOOLS) $(PLUGINSBIN)
 	@echo "Build architecture ${GOARCH} ${GOOS} network=${WCPHOST} GOFLAGS=$(GO_FLAGS) GOEXE=$(GOEXE)"
 
 $(LIBS): | ; $(info $(M) building libraries…) @ ## Build program binary
 	$Q cd $(CURDIR) && \
 	    CGO_CFLAGS="$(CGO_CFLAGS)" CGO_LDFLAGS="$(CGO_LDFLAGS) $(CGO_EXT_LDFLAGS)" $(GO) build $(GO_FLAGS) \
 		-buildmode=c-shared \
-		-ldflags '-X $(PACKAGE)/common.Version=$(ADARESTVERSION) -X $(PACKAGE)/common.BuildVersion=$(VERSION) -X $(PACKAGE)/common.BuildDate=$(DATE)' \
+		-ldflags '-X $(PACKAGE)/common.Version=$(ADARESTVERSION) -X $(PACKAGE)/common.BuildVersion=$(VERSION) -X $(PACKAGE)/common.BuildDate=$(DATE) -s -w -extldflags=-Wl,-ld_classic' \
 		-o $(BIN)/$(GOOS)/$@.so $@.go
 
 $(EXECS): $(OBJECTS) ; $(info $(M) building executable…) @ ## Build program binary
 	$Q cd $(CURDIR) && \
 	    CGO_CFLAGS="$(CGO_CFLAGS)" CGO_LDFLAGS="$(CGO_LDFLAGS) $(CGO_EXT_LDFLAGS)" $(GO) build $(GO_FLAGS) \
-		-ldflags '-X $(PACKAGE)/common.Version=$(VERSION) -X $(PACKAGE)/common.BuildDate=$(DATE)' \
+		-ldflags '-X $(PACKAGE)/common.Version=$(VERSION) -X $(PACKAGE)/common.BuildDate=$(DATE)  -extldflags=-Wl,-ld_classic' \
 		-o $@$(GOEXE) ./$(@:$(BIN)/%=%)
+
+$(PLUGINS): ; $(info $(M) building plugins…) @ ## Build program binary
+	$Q cd $(CURDIR) && \
+	    CGO_CFLAGS="$(CGO_CFLAGS)" CGO_LDFLAGS="$(CGO_LDFLAGS) $(CGO_EXT_LDFLAGS)" $(GO) build $(GO_FLAGS) \
+	    -buildmode=plugin \
+	    -ldflags '-X $(COPACKAGE).Version=$(VERSION) -X $(COPACKAGE).BuildDate=$(DATE) -s -w -extldflags=-Wl,-ld_classic' \
+	    -o $@.so ./$(@:$(BIN)/%=%)
+
 
 $(LOGPATH):
 	@mkdir -p $@
@@ -123,7 +134,9 @@ test-build: prepare ; $(info $(M) building $(NAME:%=% )tests…) @ ## Build test
 		DYLD_LIBRARY_PATH="$(DYLD_LIBRARY_PATH):$(ACLDIR)/lib" \
 	    CGO_CFLAGS="$(CGO_CFLAGS)" CGO_LDFLAGS="$(CGO_LDFLAGS) $(CGO_EXT_LDFLAGS)" \
 	    TESTFILES=$(TESTFILES) GO_ADA_MESSAGES=$(MESSAGES) LOGPATH=$(LOGPATH) REFERENCES=$(REFERENCES) \
-	    $(GO) test -c -o $(BINTESTS)/$$pkg.test$(GOEXE) $(GO_TAGS) ./$$pkg; done
+	    $(GO) test -c \
+		 	-ldflags '-X $(COPACKAGE).Version=$(RESTVERSION) -X $(COPACKAGE).BuildVersion=$(VERSION) -X github.com/tknie/services.BuildDate=$(DATE) -extldflags=-Wl,-ld_classic' \
+		 	-o $(BINTESTS)/$$pkg.test$(GOEXE) $(GO_TAGS) ./$$pkg; done
 
 TEST_TARGETS := test-default test-bench test-short test-verbose test-json test-race test-sanitizer
 .PHONY: $(TEST_TARGETS) check test tests

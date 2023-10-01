@@ -49,6 +49,10 @@ const (
 	OpenIDMethod
 	// SQLDatabaseMethod database method
 	SQLDatabaseMethod
+	// PluginMethod plugin method
+	PluginMethod
+	// CallbackMethod callback method
+	CallbackMethod
 )
 
 // MethodType parse method type out of string
@@ -65,6 +69,10 @@ func MethodType(s string) Method {
 		return SQLDatabaseMethod
 	case "ldap":
 		return LDAPMethod
+	case "plugin":
+		return PluginMethod
+	case "callback":
+		return CallbackMethod
 	}
 	return UnknownMethod
 }

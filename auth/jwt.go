@@ -247,6 +247,10 @@ func (webToken *WebToken) GenerateJWToken(IAt string, principal PrincipalInterfa
 	if webToken == nil {
 		return "", fmt.Errorf("web token not configured properly")
 	}
+	token, err := generateCallbackToken(IAt, principal)
+	if err == nil {
+		return token, err
+	}
 
 	claim := roleClaimsJose2{Roles: principal.Roles(), ID: principal.Name(), Subject: "RestServer", IAt: IAt}
 	if log.IsDebugLevel() {
@@ -339,6 +343,10 @@ func (webToken *WebToken) JWTContainsRoles(token string, scopes []string) (Princ
 		p := PrincipalCreater("XXXSJFSFJDSFJD", "XXXX", "")
 		return p, nil
 
+	}
+	p, err := checkCallbackToken(token, scopes)
+	if err == nil {
+		return p, err
 	}
 	claims, err := webToken.parseAndCheckToken2(token)
 	if err == nil {

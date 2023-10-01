@@ -15,13 +15,13 @@ GOOS              ?= $(shell $(GO) env GOOS)
 GOEXE             ?= $(shell $(GO) env GOEXE)
 GOBIN             ?= $(HOME)/go/bin
 
-PACKAGE     = github.com/tknie/services
-TESTPKGSDIR = . auth service
-DATE       ?= $(shell date +%FT%T%z)
-VERSION    ?= $(shell git describe --tags --always --dirty --match=v* 2> /dev/null || \
-			cat $(CURDIR)/.version 2> /dev/null || echo v0)
+PACKAGE            = github.com/tknie/services
+TESTPKGSDIR        = . auth service
+DATE              ?= $(shell date +%FT%T%z)
+VERSION           ?= v1.0.0.0
 PRODVERSION        = $(shell echo $(VERSION)|sed 's/\([[:digit:]]\)\.\([[:digit:]]\)\.\([[:digit:]]\)\.\([[:digit:]]\).*/v\1.\2.\3.\4/g')
 BIN                = $(CURDIR)/bin/$(GOOS)_$(GOARCH)
+PLUGINSBIN         = $(BIN)/plugins
 BINTOOLS           = $(CURDIR)/bin/tools/$(GOOS)_$(GOARCH)
 BINTESTS           = $(CURDIR)/bin/tests/$(GOOS)_$(GOARCH)
 PROMOTE            = $(CURDIR)/promote/$(GOOS)_$(GOARCH)
@@ -35,6 +35,7 @@ OBJECTS            = *.go auth/*.go service/*.go
 ENABLE_DEBUG      ?= 0
 ARTIFACTORY       ?= http://tiger:32000
 ARTIFACTORY_PASS  ?= admin:1234
+PLUGINS            = $(PLUGINSBIN)/
 
 export CGO_CFLAGS
 export CGO_LDFLAGS

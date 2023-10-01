@@ -45,6 +45,12 @@ func (service *AuthenticationServer) Authenticate(principal PrincipalInterface, 
 		principal.AddRoles(DefaultRoles)
 		log.Log.Debugf("SQL database service name %s", service.Module)
 		return PerDatabase(service.Module, user, passwd)
+	case PluginMethod:
+		log.Log.Debugf("Plugin database service name %s", service.Module)
+		return CallbackAuthenticate(service, principal, user, passwd)
+	case CallbackMethod:
+		log.Log.Debugf("Plugin database service name %s", service.Module)
+		return CallbackAuthenticate(service, principal, user, passwd)
 	default:
 		log.Log.Debugf("Unknown service name %s", service.AuthMethod.Method())
 	}
@@ -64,6 +70,10 @@ func (authMethod Method) Method() string {
 		return "OpenID"
 	case SQLDatabaseMethod:
 		return "SQL"
+	case PluginMethod:
+		return "Plugin"
+	case CallbackMethod:
+		return "Callback"
 	}
 	return "Unknown"
 }
