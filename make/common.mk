@@ -70,6 +70,9 @@ $(LOGPATH):
 $(CURLOGPATH):
 	@mkdir -p $@
 
+$(PLUGINSBIN):
+	@mkdir -p $@
+
 $(BIN):
 	@mkdir -p $@
 $(BIN)/%: $(BIN) ; $(info $(M) building bin $(BIN)/…)
