@@ -44,6 +44,7 @@ func (tc *testCallback) GenerateToken(IAt string,
 }
 
 func TestJWTCallback(t *testing.T) {
+	defer ClearCallbacks()
 	AuthenticationConfig = &Authentication{}
 	callback := &testCallback{}
 	RegisterCallback(callback)
@@ -59,6 +60,7 @@ func TestJWTCallback(t *testing.T) {
 }
 
 func TestJWTCallbackFail(t *testing.T) {
+	defer ClearCallbacks()
 	AuthenticationConfig = &Authentication{}
 	err := errors.New("Generate error")
 	callback := &testCallback{generateTokenErr: err, checkTokenErr: err}

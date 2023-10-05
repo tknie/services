@@ -37,6 +37,11 @@ func RegisterCallback(callback CallbackInterface) {
 	AuthenticationConfig.AuthenticationServer = append(AuthenticationConfig.AuthenticationServer, service)
 }
 
+func ClearCallbacks() {
+	callbackList = make([]CallbackInterface, 0)
+	callbackMap = make(map[string]CallbackInterface)
+}
+
 // CallbackInit init login service realm and authorization instances of user using callbacks or plugins
 func CallbackInit(auth *AuthenticationServer) error {
 	if c, ok := callbackMap[auth.Layer]; ok {
