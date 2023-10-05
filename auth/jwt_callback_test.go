@@ -37,7 +37,7 @@ func (tc *testCallback) CheckToken(token string, scopes []string) (PrincipalInte
 }
 func (tc *testCallback) GenerateToken(IAt string,
 	principal PrincipalInterface) (tokenString string, err error) {
-	if tc.checkTokenErr == nil {
+	if tc.generateTokenErr != nil {
 		return "", tc.generateTokenErr
 	}
 	return "TESTTOKEN", tc.generateTokenErr
