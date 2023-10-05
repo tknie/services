@@ -47,7 +47,7 @@ $(LIBS): | ; $(info $(M) building libraries…) @ ## Build program binary
 	$Q cd $(CURDIR) && \
 	    CGO_CFLAGS="$(CGO_CFLAGS)" CGO_LDFLAGS="$(CGO_LDFLAGS) $(CGO_EXT_LDFLAGS)" $(GO) build $(GO_FLAGS) \
 		-buildmode=c-shared \
-		-ldflags '-X $(PACKAGE)/common.Version=$(ADARESTVERSION) -X $(PACKAGE)/common.BuildVersion=$(VERSION) -X $(PACKAGE)/common.BuildDate=$(DATE) -s -w' \
+		-ldflags '-X $(PACKAGE)/common.Version=$(ADARESTVERSION) -X $(PACKAGE)/common.BuildVersion=$(VERSION) -X $(PACKAGE)/common.BuildDate=$(DATE)' \
 		-o $(BIN)/$(GOOS)/$@.so $@.go
 
 $(EXECS): $(OBJECTS) ; $(info $(M) building executable…) @ ## Build program binary
@@ -60,7 +60,7 @@ $(PLUGINS): ; $(info $(M) building plugins…) @ ## Build program binary
 	$Q cd $(CURDIR) && \
 	    CGO_CFLAGS="$(CGO_CFLAGS)" CGO_LDFLAGS="$(CGO_LDFLAGS) $(CGO_EXT_LDFLAGS)" $(GO) build $(GO_FLAGS) \
 	    -buildmode=plugin \
-	    -ldflags '-X $(COPACKAGE).Version=$(VERSION) -X $(COPACKAGE).BuildDate=$(DATE) -s -w' \
+	    -ldflags '-X $(COPACKAGE).Version=$(VERSION) -X $(COPACKAGE).BuildDate=$(DATE)' \
 	    -o $@.so ./$(@:$(BIN)/%=%)
 
 
