@@ -72,7 +72,7 @@ $(CURLOGPATH):
 
 $(BIN):
 	@mkdir -p $@
-$(BIN)/%: $(BIN) ; $(info $(M) building bin $(BIN)…)
+$(BIN)/%: $(BIN) ; $(info $(M) building bin $(BIN)/%…)
 	$Q tmp=$$(mktemp -d); \
 		(GO111MODULE=off GOPATH=$$tmp CGO_CFLAGS= CGO_LDFLAGS= \
 		go get $(REPOSITORY) && cp $$tmp/bin/* $(BIN)/.) || ret=$$?; \
