@@ -37,6 +37,7 @@ func RegisterCallback(callback CallbackInterface) {
 	AuthenticationConfig.AuthenticationServer = append(AuthenticationConfig.AuthenticationServer, service)
 }
 
+// ClearCallbacks clear callbacks
 func ClearCallbacks() {
 	callbackList = make([]CallbackInterface, 0)
 	callbackMap = make(map[string]CallbackInterface)
