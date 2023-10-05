@@ -47,20 +47,20 @@ $(LIBS): | ; $(info $(M) building libraries…) @ ## Build program binary
 	$Q cd $(CURDIR) && \
 	    CGO_CFLAGS="$(CGO_CFLAGS)" CGO_LDFLAGS="$(CGO_LDFLAGS) $(CGO_EXT_LDFLAGS)" $(GO) build $(GO_FLAGS) \
 		-buildmode=c-shared \
-		-ldflags '-X $(PACKAGE)/common.Version=$(ADARESTVERSION) -X $(PACKAGE)/common.BuildVersion=$(VERSION) -X $(PACKAGE)/common.BuildDate=$(DATE) -s -w -extldflags=-Wl,-ld_classic' \
+		-ldflags '-X $(PACKAGE)/common.Version=$(ADARESTVERSION) -X $(PACKAGE)/common.BuildVersion=$(VERSION) -X $(PACKAGE)/common.BuildDate=$(DATE) -s -w' \
 		-o $(BIN)/$(GOOS)/$@.so $@.go
 
 $(EXECS): $(OBJECTS) ; $(info $(M) building executable…) @ ## Build program binary
 	$Q cd $(CURDIR) && \
 	    CGO_CFLAGS="$(CGO_CFLAGS)" CGO_LDFLAGS="$(CGO_LDFLAGS) $(CGO_EXT_LDFLAGS)" $(GO) build $(GO_FLAGS) \
-		-ldflags '-X $(PACKAGE)/common.Version=$(VERSION) -X $(PACKAGE)/common.BuildDate=$(DATE)  -extldflags=-Wl,-ld_classic' \
+		-ldflags '-X $(PACKAGE)/common.Version=$(VERSION) -X $(PACKAGE)/common.BuildDate=$(DATE)' \
 		-o $@$(GOEXE) ./$(@:$(BIN)/%=%)
 
 $(PLUGINS): ; $(info $(M) building plugins…) @ ## Build program binary
 	$Q cd $(CURDIR) && \
 	    CGO_CFLAGS="$(CGO_CFLAGS)" CGO_LDFLAGS="$(CGO_LDFLAGS) $(CGO_EXT_LDFLAGS)" $(GO) build $(GO_FLAGS) \
 	    -buildmode=plugin \
-	    -ldflags '-X $(COPACKAGE).Version=$(VERSION) -X $(COPACKAGE).BuildDate=$(DATE) -s -w -extldflags=-Wl,-ld_classic' \
+	    -ldflags '-X $(COPACKAGE).Version=$(VERSION) -X $(COPACKAGE).BuildDate=$(DATE) -s -w' \
 	    -o $@.so ./$(@:$(BIN)/%=%)
 
 
@@ -135,7 +135,7 @@ test-build: prepare ; $(info $(M) building $(NAME:%=% )tests…) @ ## Build test
 	    CGO_CFLAGS="$(CGO_CFLAGS)" CGO_LDFLAGS="$(CGO_LDFLAGS) $(CGO_EXT_LDFLAGS)" \
 	    TESTFILES=$(TESTFILES) GO_ADA_MESSAGES=$(MESSAGES) LOGPATH=$(LOGPATH) REFERENCES=$(REFERENCES) \
 	    $(GO) test -c \
-		 	-ldflags '-X $(COPACKAGE).Version=$(RESTVERSION) -X $(COPACKAGE).BuildVersion=$(VERSION) -X github.com/tknie/services.BuildDate=$(DATE) -extldflags=-Wl,-ld_classic' \
+		 	-ldflags '-X $(COPACKAGE).Version=$(RESTVERSION) -X $(COPACKAGE).BuildVersion=$(VERSION) -X github.com/tknie/services.BuildDate=$(DATE)' \
 		 	-o $(BINTESTS)/$$pkg.test$(GOEXE) $(GO_TAGS) ./$$pkg; done
 
 TEST_TARGETS := test-default test-bench test-short test-verbose test-json test-race test-sanitizer
