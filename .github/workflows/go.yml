@@ -4,8 +4,8 @@
 name: Go
 
 env:
-  LOGPATH: ${GITHUB_WORKSPACE}/logs
-  TESTFILES: ${GITHUB_WORKSPACE}/files
+  LOGPATH: ${{ github.workspace }}/logs
+  TESTFILES: ${{ github.workspace }}/files
 on:
   push:
     branches: [ "main" ]
