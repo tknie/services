@@ -6,6 +6,7 @@ name: Go
 env:
   LOGPATH: ${{ github.workspace }}/logs
   TESTFILES: ${{ github.workspace }}/files
+  CURDIR: ${{ github.workspace }}
 on:
   push:
     branches: [ "main" ]
