@@ -16,6 +16,11 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - name: Install libpam dev
+      run: |
+          sudo apt-get update
+          sudo apt-get install libpam0g-dev
+
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
