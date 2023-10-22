@@ -10,7 +10,7 @@ require (
 	github.com/mitchellh/go-ps v1.0.0
 	github.com/stretchr/testify v1.8.1
 	github.com/tknie/errorrepo v0.0.0-20230429175850-6f60500223d5
-	github.com/tknie/log v0.0.0-20230709123301-620bb99e7bd6
+	github.com/tknie/log v0.0.0-20231006083545-fabe25f4fb0e
 	github.com/tknie/pam v0.0.0-20221009204632-bfcf495c828d
 	go.uber.org/zap v1.26.0
 	golang.org/x/sys v0.13.0
