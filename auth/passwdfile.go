@@ -348,7 +348,7 @@ func (rfs *PasswordFileStruct) realmWatcher() {
 		services.ServerMessage("ERROR add realm watcher at %s: %v", rfs.realmFile, err)
 		return
 	}
-	services.ServerMessage("Watcher on realm file changes of %s added", rfs.realmFile)
+	services.ServerMessage("Watch changes on realm file %s", rfs.realmFile)
 }
 
 // endRealmWatcher end realm file watcher checking modifications
