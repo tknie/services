@@ -157,8 +157,13 @@ func (xlog *Logging) InitTraceLogging() {
 		MaxAge:     xlog.MaxAge, // days
 		Compress:   xlog.Compress,
 	})
+
+	encoderCfg := zap.NewProductionEncoderConfig()
+	encoderCfg.TimeKey = "timestamp"
+	encoderCfg.EncodeTime = zapcore.ISO8601TimeEncoder
+
 	core := zapcore.NewCore(
-		zapcore.NewConsoleEncoder(cfg.EncoderConfig),
+		zapcore.NewConsoleEncoder(encoderCfg),
 		w,
 		level,
 	)
