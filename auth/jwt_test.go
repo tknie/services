@@ -163,7 +163,7 @@ func TestJWS(t *testing.T) {
 	}
 	assert.Equal(t, "TestPrincipal", pi.Name())
 	assert.Equal(t, "RemoteHost", pi.Remote())
-	assert.Equal(t, []string([]string{"xx"}), pi.Roles())
+	assert.Equal(t, []string([]string{"xx", testRole}), pi.Roles())
 	assert.Equal(t, "TestUUID", pi.UUID())
 }
 
@@ -189,7 +189,7 @@ func TestJWE(t *testing.T) {
 	}
 	assert.Equal(t, "TestPrincipal", pi.Name())
 	assert.Equal(t, "RemoteHost", pi.Remote())
-	assert.Equal(t, []string([]string{"xx"}), pi.Roles())
+	assert.Equal(t, []string([]string{"xx", testRole}), pi.Roles())
 	assert.Equal(t, "TestUUID", pi.UUID())
 }
 
