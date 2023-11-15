@@ -18,18 +18,34 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"sync"
+	"sync/atomic"
 	"testing"
+	"time"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/tknie/log"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
+const testRole = "performanceRole"
+
+var globalUserCounter = uint64(0)
+var globalTokenCounter = uint64(0)
+
 type testPrincipal struct {
+	testUUID string
+	token    string
+	user     string
+	pass     string
 }
 
 func (tp *testPrincipal) UUID() string {
+	if tp.testUUID != "" {
+		return tp.testUUID
+	}
 	return "TestUUID"
 }
 func (tp *testPrincipal) Name() string {
@@ -45,7 +61,7 @@ func (tp *testPrincipal) SetRemote(r string) {
 	fmt.Println("Set remote", r)
 }
 func (tp *testPrincipal) Roles() []string {
-	return []string{"xx"}
+	return []string{"xx", testRole}
 }
 func (tp *testPrincipal) Session() interface{} {
 	return nil
@@ -57,6 +73,12 @@ func newWinFileSink(u *url.URL) (zap.Sink, error) {
 	// Remove leading slash left by url.Parse()
 	return os.OpenFile(u.Path[1:], os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0666)
 }
+
+const maxEntries = 200
+
+var userChannel = make(chan *testPrincipal, maxEntries+1)
+var tokenChannel = make(chan *testPrincipal, maxEntries+1)
+var wg sync.WaitGroup
 
 func initLog(fileName string) (err error) {
 	switch log.Log.(type) {
@@ -183,4 +205,66 @@ func TestJWSWrong(t *testing.T) {
 	pi, err := wt.JWTContainsRoles(token, []string{"xx"})
 	assert.Error(t, err)
 	assert.Nil(t, pi)
+}
+
+func TestJWTPerformance(t *testing.T) {
+	err := initLog("jwt.log")
+	if err != nil {
+		fmt.Println("ERROR : ", err)
+		return
+	}
+	wt := &WebToken{PrivateKey: "keys/apiKey.prv",
+		PublicKey: "keys/apiKey.pem", IssuerName: "TESTISSUER"}
+	for i := 0; i < 10; i++ {
+		wg.Add(1)
+		go tokenWorker(t, wt)
+	}
+	wt.InitWebTokenJose2()
+	for i := 1; i < maxEntries; i++ {
+		u := uuid.New().String()
+		tp := &testPrincipal{testUUID: u}
+		num := fmt.Sprintf("%03d", i)
+		tp.user = "user" + num
+		tp.pass = "pass" + num
+		userChannel <- tp
+	}
+
+	wg.Wait()
+
+	/* uuidHashStore.Range(func(key, value any) bool {
+		fmt.Printf("%s=%#v\n", key, value)
+		return true
+	})*/
+	fmt.Println("User storage: ", globalUserCounter)
+	fmt.Println("Token storage:", globalUserCounter)
+	fmt.Println("Done")
+}
+
+func tokenWorker(t *testing.T, wt *WebToken) {
+	countUser := uint64(0)
+	countToken := uint64(0)
+	for {
+		select {
+		case tpUser := <-userChannel:
+			token, err := wt.GenerateJWToken("*", tpUser)
+			assert.NoError(t, err)
+			tpUser.token = token
+			countUser++
+			tokenChannel <- tpUser
+		case tpToken := <-tokenChannel:
+			assert.NotEmpty(t, tpToken.token)
+			tpI, err := wt.JWTContainsRoles(tpToken.token, []string{testRole})
+			tp := tpI.(*testPrincipal)
+			assert.NoError(t, err)
+			assert.Equal(t, tp.token, tpToken.token)
+			assert.Equal(t, tp, tpToken)
+			countToken++
+		case <-time.After(10 * time.Second):
+			atomic.AddUint64(&globalUserCounter, countUser)
+			atomic.AddUint64(&globalTokenCounter, countToken)
+			wg.Done()
+			fmt.Println("Proceed: ", countUser, countToken)
+			return
+		}
+	}
 }
