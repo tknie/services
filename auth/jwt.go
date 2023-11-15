@@ -43,6 +43,7 @@ type WebToken struct {
 	Encrypt    bool   `xml:"encrypt,attr" yaml:"encrypt,omitempty"`
 	PublicKey  string `xml:"PublicKey" yaml:"publicKey,omitempty"`
 	PrivateKey string `xml:"PrivateKey" yaml:"privateKey,omitempty"`
+	PassToken  string `xml:"PassToken" yaml:"passToken,omitempty"`
 }
 
 type jsonWebTokenData struct {
@@ -54,8 +55,7 @@ type jsonWebTokenData struct {
 	created  time.Time
 }
 
-var uuidLock sync.Mutex
-var uuidHash map[string]*jsonWebTokenData
+var uuidHashStore = sync.Map{}
 
 // roleClaims describes the format of our JWT token's claims
 type roleClaimsJose2 struct {
@@ -101,23 +101,22 @@ func cleanUpTicker() {
 // cleanUp start cleanup of all JWT tokens stored. It checks the elapsed time is after now.
 // If it is the case, the UUID entry is deleted
 func cleanUp(nowTime time.Time) {
-	uuidLock.Lock()
-	defer uuidLock.Unlock()
 	if WebTokenConfig != nil {
 		expirer, err := time.ParseDuration(WebTokenConfig.Expirer)
 		if err != nil {
 		} else {
 			sessionExpirerDuration = expirer
 		}
-		for uuid, authData := range uuidHash {
+		uuidHashStore.Range(func(uuid, value any) bool {
+			authData := value.(*jsonWebTokenData)
 			elapsed := authData.created.Add(sessionExpirerDuration)
 			if !elapsed.After(nowTime) {
 				log.Log.Infof("Remove expired UUID %s at %v", uuid, elapsed)
 				services.ServerMessage("UUID %s expired for user %s", uuid, authData.user)
-
-				delete(uuidHash, uuid)
+				uuidHashStore.Delete(uuid)
 			}
-		}
+			return true
+		})
 	}
 }
 
@@ -188,58 +187,48 @@ func (webToken *WebToken) InitWebTokenJose2() error {
 		return fmt.Errorf("public key path not defined")
 	}
 	WebTokenConfig = webToken
-	if uuidHash == nil {
-		log.Log.Debugf("Init UUID hash")
+	log.Log.Debugf("Init UUID hash")
 
-		uuidHash = make(map[string]*jsonWebTokenData)
-		if log.IsDebugLevel() {
-			log.Log.Debugf("WEBTOKEN: %v", WebTokenConfig)
-		}
-		WebTokenConfig = webToken
-
-		// loads public keys to verify our tokens
-		privateKeyBuf, err := os.ReadFile(os.ExpandEnv(webToken.PrivateKey))
-		if err != nil {
-			return fmt.Errorf("cannot load private key for tokens needed for JWT %s: %v", webToken.PrivateKey, err)
-		}
-		privateKey2, err = parseRSAPrivateKeyFromPEM(privateKeyBuf)
-		if err != nil {
-			return fmt.Errorf("invalid private key for tokens")
-		}
-
-		// loads public keys to verify our tokens
-		verifyKeyBuf, err := os.ReadFile(os.ExpandEnv(webToken.PublicKey))
-		if err != nil {
-			return fmt.Errorf("cannot load public key for tokens needed for JWT")
-		}
-		verifyKey2, err = parseRSAPublicKeyFromPEM(verifyKeyBuf)
-		if err != nil {
-			return fmt.Errorf("invalid public key for tokens")
-		}
-		encryption := "disabled"
-		if WebTokenConfig.Encrypt {
-			encryption = "enabled"
-		}
-		services.ServerMessage("JSON Web token keys initialized, JWT encryption is %s", encryption)
-	} else {
-		log.Log.Debugf("Skip UUID hash init")
+	if log.IsDebugLevel() {
+		log.Log.Debugf("WEBTOKEN: %v", WebTokenConfig)
 	}
+	WebTokenConfig = webToken
+
+	// loads public keys to verify our tokens
+	privateKeyBuf, err := os.ReadFile(os.ExpandEnv(webToken.PrivateKey))
+	if err != nil {
+		return fmt.Errorf("cannot load private key for tokens needed for JWT %s: %v", webToken.PrivateKey, err)
+	}
+	privateKey2, err = parseRSAPrivateKeyFromPEM(privateKeyBuf)
+	if err != nil {
+		return fmt.Errorf("invalid private key for tokens")
+	}
+
+	// loads public keys to verify our tokens
+	verifyKeyBuf, err := os.ReadFile(os.ExpandEnv(webToken.PublicKey))
+	if err != nil {
+		return fmt.Errorf("cannot load public key for tokens needed for JWT")
+	}
+	verifyKey2, err = parseRSAPublicKeyFromPEM(verifyKeyBuf)
+	if err != nil {
+		return fmt.Errorf("invalid public key for tokens")
+	}
+	encryption := "disabled"
+	if WebTokenConfig.Encrypt {
+		encryption = "enabled"
+	}
+	services.ServerMessage("JSON Web token keys initialized, JWT encryption is %s", encryption)
 	return nil
 }
 
 func uuidStore(principal PrincipalInterface, user, pass string) {
-	uuidLock.Lock()
-	defer uuidLock.Unlock()
 	if principal == nil {
 		return
 	}
-	if uuidHash == nil {
-		return
-	}
 	log.Log.Infof("Adding UUID %s create %v", principal.UUID(), time.Now())
-	uuidHash[principal.UUID()] = &jsonWebTokenData{uuid: principal.UUID(),
+	uuidHashStore.Store(principal.UUID(), &jsonWebTokenData{uuid: principal.UUID(),
 		user: user, password: pass, content: principal,
-		session: principal.Session(), created: time.Now()}
+		session: principal.Session(), created: time.Now()})
 }
 
 // GenerateJWToken generate JWT token using golang Jose.v2
@@ -339,8 +328,8 @@ func (webToken *WebToken) JWTContainsRoles(token string, scopes []string) (Princ
 	if log.IsDebugLevel() {
 		log.Log.Debugf("Has role scopes %#v", scopes)
 	}
-	if token == "XXXSJFSFJDSFJD" {
-		p := PrincipalCreater("XXXSJFSFJDSFJD", "XXXX", "")
+	if webToken.PassToken != "" && token == webToken.PassToken {
+		p := PrincipalCreater(webToken.PassToken, "XXXX", "")
 		return p, nil
 
 	}
@@ -387,10 +376,8 @@ func (webToken *WebToken) JWTContainsRoles(token string, scopes []string) (Princ
 			}
 			if claims.IAt == "<pass>" {
 				services.ServerMessage(fmt.Sprintf("Token passed and UUID created: %s", claims.ID))
-				uuidLock.Lock()
-				defer uuidLock.Unlock()
-				uuidHash[claims.UUID] = &jsonWebTokenData{uuid: claims.UUID,
-					user: claims.ID, password: "", created: time.Now()}
+				uuidHashStore.Store(claims.UUID, &jsonWebTokenData{uuid: claims.UUID,
+					user: claims.ID, password: "", created: time.Now()})
 				p := PrincipalCreater(claims.UUID, claims.ID, "")
 				p.SetRemote(claims.Remote)
 				p.AddRoles(claims.Roles)
@@ -399,7 +386,7 @@ func (webToken *WebToken) JWTContainsRoles(token string, scopes []string) (Princ
 			if log.IsDebugLevel() {
 				log.Log.Debugf("UUID %s not found for %s", claims.UUID, claims.ID)
 			}
-			services.ServerMessage("Token error, UUID issuer %s for %s not found", issuer, claims.ID)
+			services.ServerMessage("Token error, UUID %s token not found", claims.UUID, issuer, claims.ID)
 			return nil, errors.New(http.StatusUnauthorized, "Unauthorized..")
 		}
 		if log.IsDebugLevel() {
@@ -416,9 +403,8 @@ func (webToken *WebToken) JWTContainsRoles(token string, scopes []string) (Princ
 }
 
 func validUUID(claims *roleClaimsJose2) (PrincipalInterface, bool) {
-	uuidLock.Lock()
-	defer uuidLock.Unlock()
-	if auth, ok := uuidHash[claims.UUID]; ok {
+	if v, ok := uuidHashStore.Load(claims.UUID); ok {
+		auth := v.(*jsonWebTokenData)
 		var p PrincipalInterface
 		if auth.content != nil {
 			p = auth.content.(PrincipalInterface)
@@ -439,8 +425,6 @@ func validUUID(claims *roleClaimsJose2) (PrincipalInterface, bool) {
 
 // InvalidateUUID invalidate UUID not valid any more
 func InvalidateUUID(uuid string) {
-	uuidLock.Lock()
-	defer uuidLock.Unlock()
 	log.Log.Infof("Invalidate UUID %s", uuid)
-	delete(uuidHash, uuid)
+	uuidHashStore.Delete(uuid)
 }
