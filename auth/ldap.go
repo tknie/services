@@ -50,7 +50,7 @@ type Source struct {
 	Filter            string // Query filter to validate entry
 	AdminFilter       string // Query filter to check if user is admin
 	RestrictedFilter  string // Query filter to check if user is restricted
-	Enabled           bool   `xml:-`                    // if this source is disabled
+	Enabled           bool   `xml:"-"`                  // if this source is disabled
 	GroupsEnabled     bool   `xml:"groupsEnabled,attr"` // if the group checking is enabled
 	GroupDN           string // Group Search Base
 	GroupFilter       string // Group Name Filter

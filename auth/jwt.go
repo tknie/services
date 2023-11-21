@@ -46,16 +46,28 @@ type WebToken struct {
 	PassToken  string `xml:"PassToken" yaml:"passToken,omitempty"`
 }
 
+type UserInfo struct {
+	UUID     string
+	User     string
+	Picture  string
+	EMail    string
+	LongName string
+	Created  time.Time
+}
+
 type jsonWebTokenData struct {
-	uuid     string
-	user     string
+	User     UserInfo
 	password string
 	session  interface{}
 	content  interface{}
-	created  time.Time
 }
 
 var uuidHashStore = sync.Map{}
+
+// Trigger functions
+
+// TriggerInvalidUUID trigger if UUID is invalidated
+var TriggerInvalidUUID func(any)
 
 // roleClaims describes the format of our JWT token's claims
 type roleClaimsJose2 struct {
@@ -109,11 +121,9 @@ func cleanUp(nowTime time.Time) {
 		}
 		uuidHashStore.Range(func(uuid, value any) bool {
 			authData := value.(*jsonWebTokenData)
-			elapsed := authData.created.Add(sessionExpirerDuration)
+			elapsed := authData.User.Created.Add(sessionExpirerDuration)
 			if !elapsed.After(nowTime) {
-				log.Log.Infof("Remove expired UUID %s at %v", uuid, elapsed)
-				services.ServerMessage("UUID %s expired for user %s", uuid, authData.user)
-				uuidHashStore.Delete(uuid)
+				InvalidateUUID(uuid.(string), elapsed)
 			}
 			return true
 		})
@@ -226,9 +236,9 @@ func uuidStore(principal PrincipalInterface, user, pass string) {
 		return
 	}
 	log.Log.Infof("Adding UUID %s create %v", principal.UUID(), time.Now())
-	uuidHashStore.Store(principal.UUID(), &jsonWebTokenData{uuid: principal.UUID(),
-		user: user, password: pass, content: principal,
-		session: principal.Session(), created: time.Now()})
+	uuidHashStore.Store(principal.UUID(), &jsonWebTokenData{User: UserInfo{UUID: principal.UUID(),
+		User: user, Created: time.Now()}, password: pass, content: principal,
+		session: principal.Session()})
 }
 
 // GenerateJWToken generate JWT token using golang Jose.v2
@@ -376,8 +386,8 @@ func (webToken *WebToken) JWTContainsRoles(token string, scopes []string) (Princ
 			}
 			if claims.IAt == "<pass>" {
 				services.ServerMessage(fmt.Sprintf("Token passed and UUID created: %s", claims.ID))
-				uuidHashStore.Store(claims.UUID, &jsonWebTokenData{uuid: claims.UUID,
-					user: claims.ID, password: "", created: time.Now()})
+				uuidHashStore.Store(claims.UUID, &jsonWebTokenData{User: UserInfo{UUID: claims.UUID,
+					User: claims.ID, Created: time.Now()}, password: ""})
 				p := PrincipalCreater(claims.UUID, claims.ID, "")
 				p.SetRemote(claims.Remote)
 				p.AddRoles(claims.Roles)
@@ -409,7 +419,7 @@ func validUUID(claims *roleClaimsJose2) (PrincipalInterface, bool) {
 		if auth.content != nil {
 			p = auth.content.(PrincipalInterface)
 		} else {
-			p = PrincipalCreater(auth.uuid, auth.user, auth.password)
+			p = PrincipalCreater(auth.User.UUID, auth.User.User, auth.password)
 			p.SetRemote(claims.Remote)
 			p.SetSession(auth.session)
 			p.AddRoles(claims.Roles)
@@ -424,7 +434,28 @@ func validUUID(claims *roleClaimsJose2) (PrincipalInterface, bool) {
 }
 
 // InvalidateUUID invalidate UUID not valid any more
-func InvalidateUUID(uuid string) {
-	log.Log.Infof("Invalidate UUID %s", uuid)
-	uuidHashStore.Delete(uuid)
+func InvalidateUUID(uuid string, elapsed time.Time) bool {
+	if v, ok := uuidHashStore.LoadAndDelete(uuid); ok {
+		tokenData := v.(*jsonWebTokenData)
+		log.Log.Infof("Remove expired UUID %s at %v", uuid, elapsed)
+		services.ServerMessage("UUID %s expired for user %s",
+			uuid, tokenData.User.User)
+		user := &UserInfo{}
+		*user = tokenData.User
+		TriggerInvalidUUID(user)
+		return true
+	}
+	return false
+}
+
+func UUIDInfo(uuid string) *UserInfo {
+	if v, ok := uuidHashStore.Load(uuid); ok {
+		tokenData := v.(*jsonWebTokenData)
+		user := &UserInfo{}
+		*user = tokenData.User
+		TriggerInvalidUUID(user)
+		return user
+	}
+	return nil
+
 }

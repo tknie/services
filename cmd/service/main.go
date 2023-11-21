@@ -1,3 +1,14 @@
+/*
+* Copyright 2022-2023 Thorsten A. Knieling
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+ */
+
 package main
 
 import (
@@ -16,24 +27,24 @@ type SVC struct {
 
 // Run run the service
 func (svc *SVC) Run(env *service.Parameters) error {
-	execCommand := os.Getenv("ADA_REST_SERVER_CMD")
+	/*execCommand := os.Getenv("ADA_REST_SERVER_CMD")
 	if execCommand == "" {
 		execCommand = env.AppDirectory() + string(os.PathSeparator) + env.AppPath
 	}
-	//arg := []string{"server"}
-	// return env.Execute(execCommand, arg)
+	arg := []string{"server"}
+	return env.Execute(execCommand, arg)*/
 	return fmt.Errorf("error running service")
 }
 
 // Shutdown shutdown service
 func (svc *SVC) Shutdown(env *service.Parameters) error {
 	fmt.Println("Stop of service called")
-	execCommand := os.Getenv("ADA_REST_CLIENT_CMD")
-	if execCommand == "" {
-		execCommand = env.AppDirectory() + string(os.PathSeparator) + env.AppPath
-	}
-	// arg := []string{"client", "-s"}
-	// return env.Execute(execCommand, arg)
+	/*	execCommand := os.Getenv("ADA_REST_CLIENT_CMD")
+		if execCommand == "" {
+			execCommand = env.AppDirectory() + string(os.PathSeparator) + env.AppPath
+		}
+		arg := []string{"client", "-s"}
+		 return env.Execute(execCommand, arg)*/
 	return fmt.Errorf("error shutdown service")
 }
 
