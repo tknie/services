@@ -46,6 +46,7 @@ type WebToken struct {
 	PassToken  string `xml:"PassToken" yaml:"passToken,omitempty"`
 }
 
+// UserInfo user information context
 type UserInfo struct {
 	UUID     string
 	User     string
@@ -448,6 +449,7 @@ func InvalidateUUID(uuid string, elapsed time.Time) bool {
 	return false
 }
 
+// UUIDInfo get UUID info User information
 func UUIDInfo(uuid string) *UserInfo {
 	if v, ok := uuidHashStore.Load(uuid); ok {
 		tokenData := v.(*jsonWebTokenData)
