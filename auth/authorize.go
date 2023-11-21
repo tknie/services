@@ -226,7 +226,7 @@ func (users *Users) Delete(user string) error {
 // ValidAdmin check the role of the user
 func ValidAdmin(user string) bool {
 	log.Log.Debugf("Validate admin: %s", user)
-	return ValidUser(AdministratorRole, true, user, "")
+	return ValidUser(AdministratorRole, true, &UserInfo{User: user}, "")
 }
 
 func checkAdminstratorRole(user string) bool {
@@ -319,21 +319,23 @@ func checkUserRole(user, resource string, writeAccess bool) bool {
 }
 
 // ValidUser check the role of the user
-func ValidUser(role AccessRole, writeAccess bool, user, resource string) bool {
-	switch role {
-	case AdministratorRole:
-		return checkAdminstratorRole(user)
-	case UserRole:
-		return checkUserRole(user, resource, writeAccess)
-	default:
-		log.Log.Debugf("Role invalid")
+func ValidUser(role AccessRole, writeAccess bool, user *UserInfo, resource string) bool {
+	if user != nil {
+		switch role {
+		case AdministratorRole:
+			return checkAdminstratorRole(user.User)
+		case UserRole:
+			return checkUserRole(user.User, resource, writeAccess)
+		default:
+			log.Log.Debugf("Role invalid")
+		}
 	}
 	return false
 }
 
 func evaluateRoles(principal PrincipalInterface) {
 	principal.AddRoles([]string{"user"})
-	if ValidUser(AdministratorRole, true, principal.Name(), "") {
+	if ValidUser(AdministratorRole, true, &UserInfo{User: principal.Name()}, "") {
 		principal.AddRoles([]string{"admin"})
 	}
 }
