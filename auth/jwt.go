@@ -68,7 +68,7 @@ var uuidHashStore = sync.Map{}
 // Trigger functions
 
 // TriggerInvalidUUID trigger if UUID is invalidated
-var TriggerInvalidUUID func(any)
+var TriggerInvalidUUID func(*UserInfo)
 
 // roleClaims describes the format of our JWT token's claims
 type roleClaimsJose2 struct {
