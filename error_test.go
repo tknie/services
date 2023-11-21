@@ -95,7 +95,7 @@ func TestErrors(t *testing.T) {
 		return
 	}
 
-	assert.Equal(t, "Unknown error ...SYS00001", NewError("SYS00001").Error())
+	assert.Equal(t, "SYS00001: Unknown error ...SYS00001", NewError("SYS00001").Error())
 	fmt.Println("Test")
 	assert.Equal(t, "SYS00002: user xxx unknown", NewError("SYS00002", "xxx").Error())
 	assert.Equal(t, "SYS00003: not implemented", NewError("SYS00003").Error())
