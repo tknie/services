@@ -405,12 +405,12 @@ func (webToken *WebToken) JWTContainsRoles(token string, scopes []string) (Princ
 		}
 		services.ServerMessage("Unauthorized token (Issuer error): %s (%s)", WebTokenConfig.IssuerName, claims.ID)
 		return nil, errors.New(http.StatusUnauthorized, "Unauthorized...issuer incorrect for "+claims.UUID+" / "+claims.ID)
-	} else {
-		if log.IsDebugLevel() {
-			log.Log.Debugf("Claim error")
-		}
-		services.ServerMessage("Unauthorized token (Claim error): %v", err)
 	}
+	if log.IsDebugLevel() {
+		log.Log.Debugf("Claim error")
+	}
+	services.ServerMessage("Unauthorized token (Claim error): %v", err)
+
 	return nil, errors.New(http.StatusUnauthorized, "Unauthorized: invalid Bearer token: %v", err)
 }
 
