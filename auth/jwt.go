@@ -49,7 +49,7 @@ type WebToken struct {
 // UserInfo user information context
 type UserInfo struct {
 	UUID     string
-	User     string
+	User     string `flynn:"Name"`
 	Picture  string
 	EMail    string
 	LongName string
