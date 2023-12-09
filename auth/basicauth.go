@@ -16,7 +16,6 @@ import (
 	"os"
 
 	errors "github.com/go-openapi/errors"
-	"github.com/google/uuid"
 	"github.com/tknie/log"
 	"github.com/tknie/services"
 )
@@ -36,7 +35,7 @@ type PrincipalInterface interface {
 var principalRegister []func(PrincipalInterface) error
 
 // PrincipalCreater creator of an principal instance
-var PrincipalCreater func(UUID, user, pass string) PrincipalInterface
+var PrincipalCreater func(session *SessionInfo, user, pass string) PrincipalInterface
 
 // AuthenticationConfig authentication config base
 var AuthenticationConfig *Authentication
@@ -54,9 +53,10 @@ func BasicAuth(user string, pass string) (PrincipalInterface, error) {
 		services.ServerMessage("Fatal: No Authentication defined!!!!!")
 		os.Exit(201)
 	}
+	sessionUUID := NewSessionInfo()
+	principal := PrincipalCreater(sessionUUID, user, pass)
 	for _, s := range AuthenticationConfig.AuthenticationServer {
 		log.Log.Debugf("Check %s authentication (%p)", s.Type, s)
-		principal := PrincipalCreater(uuid.New().String(), user, pass)
 		err := s.Authenticate(principal, user, pass)
 		if err == nil {
 			log.Log.Debugf("Validated by %s authentication", s.Type)

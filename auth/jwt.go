@@ -23,6 +23,7 @@ import (
 	"time"
 
 	errors "github.com/go-openapi/errors"
+	"github.com/google/uuid"
 	"github.com/tknie/log"
 	"github.com/tknie/services"
 
@@ -48,7 +49,6 @@ type WebToken struct {
 
 // UserInfo user information context
 type UserInfo struct {
-	UUID     string
 	User     string `flynn:"Name"`
 	Picture  string
 	EMail    string
@@ -56,22 +56,39 @@ type UserInfo struct {
 	Created  time.Time
 }
 
+// SessionInfo session information context
+type SessionInfo struct {
+	User    string `flynn:"Name"`
+	UUID    string
+	Created time.Time
+}
+
 type jsonWebTokenData struct {
 	User     UserInfo
+	Session  SessionInfo
 	password string
 	session  interface{}
 	content  interface{}
 }
 
-var uuidHashStore = sync.Map{}
+// JWTValidate JWT validate instance
+type JWTValidate interface {
+	Range(func(uuid, value any) bool)
+	ValidateUUID(claims *JWTClaims) (PrincipalInterface, bool)
+	InvalidateUUID(string, time.Time) bool
+	Store(PrincipalInterface, string, string)
+}
+
+// JWTOperator JWT operator check for UUID
+var JWTOperator = &DefaultJWTHandler{uuidHashStore: sync.Map{}}
 
 // Trigger functions
 
 // TriggerInvalidUUID trigger if UUID is invalidated
 var TriggerInvalidUUID func(*UserInfo)
 
-// roleClaims describes the format of our JWT token's claims
-type roleClaimsJose2 struct {
+// JWTClaims describes the format of our JWT token's claims
+type JWTClaims struct {
 	UUID      string           `json:"jti,omitempty"`
 	Subject   string           `json:"sub,omitempty"`
 	Audience  string           `json:"aud,omitempty"`
@@ -83,12 +100,15 @@ type roleClaimsJose2 struct {
 	ExpiresAt *jwt.NumericDate `json:"exp,omitempty"`
 }
 
+// NewSessionInfo create a new Session Info instance with created and UUID filled
+func NewSessionInfo() *SessionInfo {
+	return &SessionInfo{UUID: uuid.New().String(), Created: time.Now()}
+}
+
 // WebTokenConfig web token JWT configuration
 var WebTokenConfig *WebToken
 var sessionExpirerDuration = time.Duration(6) * time.Hour
 
-// var privateKeyJose2 *jose.JSONWebSignature
-// var rsaPrivateKeyPassword = ""
 var ticker *time.Ticker
 var doneTicker = make(chan bool)
 
@@ -120,11 +140,11 @@ func cleanUp(nowTime time.Time) {
 		} else {
 			sessionExpirerDuration = expirer
 		}
-		uuidHashStore.Range(func(uuid, value any) bool {
+		JWTOperator.Range(func(uuid, value any) bool {
 			authData := value.(*jsonWebTokenData)
 			elapsed := authData.User.Created.Add(sessionExpirerDuration)
 			if !elapsed.After(nowTime) {
-				InvalidateUUID(uuid.(string), elapsed)
+				JWTOperator.InvalidateUUID(uuid.(string), elapsed)
 			}
 			return true
 		})
@@ -236,10 +256,7 @@ func uuidStore(principal PrincipalInterface, user, pass string) {
 	if principal == nil {
 		return
 	}
-	log.Log.Infof("Adding UUID %s create %v", principal.UUID(), time.Now())
-	uuidHashStore.Store(principal.UUID(), &jsonWebTokenData{User: UserInfo{UUID: principal.UUID(),
-		User: user, Created: time.Now()}, password: pass, content: principal,
-		session: principal.Session()})
+	JWTOperator.Store(principal, user, pass)
 }
 
 // GenerateJWToken generate JWT token using golang Jose.v2
@@ -252,7 +269,7 @@ func (webToken *WebToken) GenerateJWToken(IAt string, principal PrincipalInterfa
 		return token, err
 	}
 
-	claim := roleClaimsJose2{Roles: principal.Roles(), ID: principal.Name(), Subject: "RestServer", IAt: IAt}
+	claim := JWTClaims{Roles: principal.Roles(), ID: principal.Name(), Subject: "RestServer", IAt: IAt}
 	if log.IsDebugLevel() {
 		log.Log.Debugf("Generate token -> Principal %s: %#v", principal.Name(), principal.Roles())
 	}
@@ -299,7 +316,7 @@ func (webToken *WebToken) GenerateJWToken(IAt string, principal PrincipalInterfa
 
 // parseAndCheckToken2 parse and check token with Jose.v2
 // use decrypt or signature check if configured
-func (webToken *WebToken) parseAndCheckToken2(token string) (*roleClaimsJose2, error) {
+func (webToken *WebToken) parseAndCheckToken2(token string) (*JWTClaims, error) {
 	if webToken.Encrypt {
 		tok, err := jose.ParseEncrypted(token)
 		if err != nil {
@@ -309,7 +326,7 @@ func (webToken *WebToken) parseAndCheckToken2(token string) (*roleClaimsJose2, e
 		if decErr != nil {
 			return nil, decErr
 		}
-		out := &roleClaimsJose2{}
+		out := &JWTClaims{}
 		err = json.Unmarshal(x, out)
 		if err != nil {
 			return nil, err
@@ -324,7 +341,7 @@ func (webToken *WebToken) parseAndCheckToken2(token string) (*roleClaimsJose2, e
 	if signErr != nil {
 		return nil, signErr
 	}
-	out := &roleClaimsJose2{}
+	out := &JWTClaims{}
 	err = json.Unmarshal(x, out)
 	if err != nil {
 		return nil, err
@@ -340,7 +357,8 @@ func (webToken *WebToken) JWTContainsRoles(token string, scopes []string) (Princ
 		log.Log.Debugf("Has role scopes %#v", scopes)
 	}
 	if webToken.PassToken != "" && token == webToken.PassToken {
-		p := PrincipalCreater(webToken.PassToken, "XXXX", "")
+		si := &SessionInfo{UUID: webToken.PassToken}
+		p := PrincipalCreater(si, "XXXX", "")
 		return p, nil
 
 	}
@@ -385,15 +403,6 @@ func (webToken *WebToken) JWTContainsRoles(token string, scopes []string) (Princ
 			if p, ok := validUUID(claims); ok {
 				return p, nil
 			}
-			if claims.IAt == "<pass>" {
-				services.ServerMessage(fmt.Sprintf("Token passed and UUID created: %s", claims.ID))
-				uuidHashStore.Store(claims.UUID, &jsonWebTokenData{User: UserInfo{UUID: claims.UUID,
-					User: claims.ID, Created: time.Now()}, password: ""})
-				p := PrincipalCreater(claims.UUID, claims.ID, "")
-				p.SetRemote(claims.Remote)
-				p.AddRoles(claims.Roles)
-				return p, nil
-			}
 			if log.IsDebugLevel() {
 				log.Log.Debugf("UUID %s not found for %s", claims.UUID, claims.ID)
 			}
@@ -414,51 +423,16 @@ func (webToken *WebToken) JWTContainsRoles(token string, scopes []string) (Princ
 	return nil, errors.New(http.StatusUnauthorized, "Unauthorized: invalid Bearer token: %v", err)
 }
 
-func validUUID(claims *roleClaimsJose2) (PrincipalInterface, bool) {
-	if v, ok := uuidHashStore.Load(claims.UUID); ok {
-		auth := v.(*jsonWebTokenData)
-		var p PrincipalInterface
-		if auth.content != nil {
-			p = auth.content.(PrincipalInterface)
-		} else {
-			p = PrincipalCreater(auth.User.UUID, auth.User.User, auth.password)
-			p.SetRemote(claims.Remote)
-			p.SetSession(auth.session)
-			p.AddRoles(claims.Roles)
-		}
-		log.Log.Debugf("Create JWT principal: %p", p)
-		// if p.Session == nil {
-		// 	p.Session = admin.CreateSession(auth.user, auth.password)
-		// }
-		return p, true
-	}
-	return nil, false
+func validUUID(claims *JWTClaims) (PrincipalInterface, bool) {
+	return JWTOperator.ValidateUUID(claims)
 }
 
 // InvalidateUUID invalidate UUID not valid any more
 func InvalidateUUID(uuid string, elapsed time.Time) bool {
-	if v, ok := uuidHashStore.LoadAndDelete(uuid); ok {
-		tokenData := v.(*jsonWebTokenData)
-		log.Log.Infof("Remove expired UUID %s at %v", uuid, elapsed)
-		services.ServerMessage("UUID %s expired for user %s",
-			uuid, tokenData.User.User)
-		user := &UserInfo{}
-		*user = tokenData.User
-		TriggerInvalidUUID(user)
-		return true
-	}
-	return false
+	return JWTOperator.InvalidateUUID(uuid, elapsed)
 }
 
 // UUIDInfo get UUID info User information
 func UUIDInfo(uuid string) *UserInfo {
-	if v, ok := uuidHashStore.Load(uuid); ok {
-		tokenData := v.(*jsonWebTokenData)
-		user := &UserInfo{}
-		*user = tokenData.User
-		TriggerInvalidUUID(user)
-		return user
-	}
-	return nil
-
+	return JWTOperator.UUIDInfo(uuid)
 }
