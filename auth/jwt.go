@@ -49,7 +49,7 @@ type WebToken struct {
 
 // UserInfo user information context
 type UserInfo struct {
-	User     string `flynn:"Name"`
+	User     string `flynn:"Name:PRIMARY KEY"`
 	Picture  string
 	EMail    string
 	LongName string
@@ -58,9 +58,10 @@ type UserInfo struct {
 
 // SessionInfo session information context
 type SessionInfo struct {
-	User    string `flynn:"Name"`
-	UUID    string
-	Created time.Time
+	User        string `flynn:"Name"`
+	UUID        string `flynn:"UUID:PRIMARY KEY"`
+	Created     time.Time
+	Invalidated time.Time
 }
 
 type jsonWebTokenData struct {
