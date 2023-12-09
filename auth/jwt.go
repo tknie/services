@@ -85,7 +85,7 @@ var JWTOperator = &DefaultJWTHandler{uuidHashStore: sync.Map{}}
 // Trigger functions
 
 // TriggerInvalidUUID trigger if UUID is invalidated
-var TriggerInvalidUUID func(*UserInfo)
+var TriggerInvalidUUID func(*SessionInfo)
 
 // JWTClaims describes the format of our JWT token's claims
 type JWTClaims struct {
