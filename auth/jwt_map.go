@@ -31,7 +31,7 @@ func (df *DefaultJWTHandler) UUIDInfo(uuid string) *UserInfo {
 		tokenData := v.(*jsonWebTokenData)
 		user := &UserInfo{}
 		*user = tokenData.User
-		TriggerInvalidUUID(&tokenData.Session)
+		TriggerInvalidUUID(&tokenData.Session, &tokenData.User)
 		return user
 	}
 	return nil
@@ -52,7 +52,7 @@ func (df *DefaultJWTHandler) InvalidateUUID(uuid string, elapsed time.Time) bool
 			uuid, tokenData.User.User)
 		user := &UserInfo{}
 		*user = tokenData.User
-		TriggerInvalidUUID(&tokenData.Session)
+		TriggerInvalidUUID(&tokenData.Session, &tokenData.User)
 		return true
 	}
 	return false
