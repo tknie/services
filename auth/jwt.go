@@ -104,8 +104,8 @@ type JWTClaims struct {
 }
 
 // NewSessionInfo create a new Session Info instance with created and UUID filled
-func NewSessionInfo() *SessionInfo {
-	return &SessionInfo{UUID: uuid.New().String(), Created: time.Now()}
+func NewSessionInfo(user string) *SessionInfo {
+	return &SessionInfo{User: user, UUID: uuid.New().String(), Created: time.Now()}
 }
 
 // WebTokenConfig web token JWT configuration
@@ -255,11 +255,11 @@ func (webToken *WebToken) InitWebTokenJose2() error {
 	return nil
 }
 
-func uuidStore(principal PrincipalInterface, user, pass string) {
+func uuidStore(principal PrincipalInterface, user, pass string) error {
 	if principal == nil {
-		return
+		return fmt.Errorf("principal configuration error")
 	}
-	JWTOperator.Store(principal, user, pass)
+	return JWTOperator.Store(principal, user, pass)
 }
 
 // GenerateJWToken generate JWT token using golang Jose.v2

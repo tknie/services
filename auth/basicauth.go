@@ -53,7 +53,7 @@ func BasicAuth(user string, pass string) (PrincipalInterface, error) {
 		services.ServerMessage("Fatal: No Authentication defined!!!!!")
 		os.Exit(201)
 	}
-	sessionUUID := NewSessionInfo()
+	sessionUUID := NewSessionInfo(user)
 	principal := PrincipalCreater(sessionUUID, user, pass)
 	for _, s := range AuthenticationConfig.AuthenticationServer {
 		log.Log.Debugf("Check %s authentication (%p)", s.Type, s)
@@ -61,7 +61,10 @@ func BasicAuth(user string, pass string) (PrincipalInterface, error) {
 		if err == nil {
 			log.Log.Debugf("Validated by %s authentication", s.Type)
 			log.Log.Debugf("User authentication ok: %s", user)
-			uuidStore(principal, user, pass)
+			err = uuidStore(principal, user, pass)
+			if err != nil {
+				return nil, err
+			}
 			evaluateRoles(principal)
 			if log.IsDebugLevel() {
 				log.Log.Debugf("Create principal: %p", principal.Name)
