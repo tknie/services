@@ -144,8 +144,7 @@ func cleanUp(nowTime time.Time) {
 			sessionExpirerDuration = expirer
 		}
 		JWTOperator.Range(func(uuid, value any) bool {
-			authData := value.(*jsonWebTokenData)
-			elapsed := authData.User.Created.Add(sessionExpirerDuration)
+			elapsed := value.(time.Time)
 			if !elapsed.After(nowTime) {
 				JWTOperator.InvalidateUUID(uuid.(string), elapsed)
 			}

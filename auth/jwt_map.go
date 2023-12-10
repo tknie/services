@@ -39,7 +39,12 @@ func (df *DefaultJWTHandler) UUIDInfo(uuid string) (*SessionInfo, error) {
 
 // Range go through all session entries
 func (df *DefaultJWTHandler) Range(f func(uuid, value any) bool) error {
-	df.uuidHashStore.Range(f)
+
+	df.uuidHashStore.Range(func(key, value any) bool {
+		authData := value.(*jsonWebTokenData)
+		elapsed := authData.User.Created.Add(sessionExpirerDuration)
+		return f(key, elapsed)
+	})
 	return nil
 }
 
