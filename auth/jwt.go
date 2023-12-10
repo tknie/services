@@ -61,6 +61,7 @@ type SessionInfo struct {
 	User        string `flynn:"Name"`
 	UUID        string `flynn:"UUID:PRIMARY KEY"`
 	Created     time.Time
+	LastAccess  time.Time
 	Invalidated time.Time
 }
 
