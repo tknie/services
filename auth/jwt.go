@@ -75,7 +75,7 @@ type jsonWebTokenData struct {
 
 // JWTValidate JWT validate instance
 type JWTValidate interface {
-	UUIDInfo(uuid string) *UserInfo
+	UUIDInfo(uuid string) *SessionInfo
 	Range(func(uuid, value any) bool)
 	ValidateUUID(claims *JWTClaims) (PrincipalInterface, bool)
 	InvalidateUUID(string, time.Time) bool
@@ -436,6 +436,6 @@ func InvalidateUUID(uuid string, elapsed time.Time) bool {
 }
 
 // UUIDInfo get UUID info User information
-func UUIDInfo(uuid string) *UserInfo {
+func UUIDInfo(uuid string) *SessionInfo {
 	return JWTOperator.UUIDInfo(uuid)
 }

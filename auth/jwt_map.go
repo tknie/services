@@ -26,13 +26,13 @@ type DefaultJWTHandler struct {
 }
 
 // UUIDInfo get UUID info User information
-func (df *DefaultJWTHandler) UUIDInfo(uuid string) *UserInfo {
+func (df *DefaultJWTHandler) UUIDInfo(uuid string) *SessionInfo {
 	if v, ok := df.uuidHashStore.Load(uuid); ok {
 		tokenData := v.(*jsonWebTokenData)
 		user := &UserInfo{}
 		*user = tokenData.User
 		TriggerInvalidUUID(&tokenData.Session, &tokenData.User)
-		return user
+		return &tokenData.Session
 	}
 	return nil
 
