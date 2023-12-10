@@ -75,6 +75,7 @@ type jsonWebTokenData struct {
 
 // JWTValidate JWT validate instance
 type JWTValidate interface {
+	UUIDInfo(uuid string) *UserInfo
 	Range(func(uuid, value any) bool)
 	ValidateUUID(claims *JWTClaims) (PrincipalInterface, bool)
 	InvalidateUUID(string, time.Time) bool
@@ -82,7 +83,7 @@ type JWTValidate interface {
 }
 
 // JWTOperator JWT operator check for UUID
-var JWTOperator = &DefaultJWTHandler{uuidHashStore: sync.Map{}}
+var JWTOperator = JWTValidate(&DefaultJWTHandler{uuidHashStore: sync.Map{}})
 
 // Trigger functions
 
