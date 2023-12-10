@@ -75,11 +75,11 @@ type jsonWebTokenData struct {
 
 // JWTValidate JWT validate instance
 type JWTValidate interface {
-	UUIDInfo(uuid string) *SessionInfo
-	Range(func(uuid, value any) bool)
+	UUIDInfo(uuid string) (*SessionInfo, error)
+	Range(func(uuid, value any) bool) error
 	ValidateUUID(claims *JWTClaims) (PrincipalInterface, bool)
 	InvalidateUUID(string, time.Time) bool
-	Store(PrincipalInterface, string, string)
+	Store(PrincipalInterface, string, string) error
 }
 
 // JWTOperator JWT operator check for UUID
@@ -214,11 +214,11 @@ func parseRSAPublicKeyFromPEM(key []byte) (*rsa.PublicKey, error) {
 func (webToken *WebToken) InitWebTokenJose2() error {
 	switch {
 	case webToken == nil:
-		return fmt.Errorf("instance not defined")
+		return services.NewError("SYS00031")
 	case webToken.PrivateKey == "":
-		return fmt.Errorf("private key path not defined")
+		return services.NewError("SYS00032")
 	case webToken.PublicKey == "":
-		return fmt.Errorf("public key path not defined")
+		return services.NewError("SYS00033")
 	}
 	WebTokenConfig = webToken
 	log.Log.Debugf("Init UUID hash")
@@ -231,11 +231,11 @@ func (webToken *WebToken) InitWebTokenJose2() error {
 	// loads public keys to verify our tokens
 	privateKeyBuf, err := os.ReadFile(os.ExpandEnv(webToken.PrivateKey))
 	if err != nil {
-		return fmt.Errorf("cannot load private key for tokens needed for JWT %s: %v", webToken.PrivateKey, err)
+		return services.NewError("SYS00034", webToken.PrivateKey, err)
 	}
 	privateKey2, err = parseRSAPrivateKeyFromPEM(privateKeyBuf)
 	if err != nil {
-		return fmt.Errorf("invalid private key for tokens")
+		return services.NewError("SYS00035")
 	}
 
 	// loads public keys to verify our tokens
@@ -436,6 +436,6 @@ func InvalidateUUID(uuid string, elapsed time.Time) bool {
 }
 
 // UUIDInfo get UUID info User information
-func UUIDInfo(uuid string) *SessionInfo {
+func UUIDInfo(uuid string) (*SessionInfo, error) {
 	return JWTOperator.UUIDInfo(uuid)
 }

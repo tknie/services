@@ -26,21 +26,21 @@ type DefaultJWTHandler struct {
 }
 
 // UUIDInfo get UUID info User information
-func (df *DefaultJWTHandler) UUIDInfo(uuid string) *SessionInfo {
+func (df *DefaultJWTHandler) UUIDInfo(uuid string) (*SessionInfo, error) {
 	if v, ok := df.uuidHashStore.Load(uuid); ok {
 		tokenData := v.(*jsonWebTokenData)
 		user := &UserInfo{}
 		*user = tokenData.User
 		TriggerInvalidUUID(&tokenData.Session, &tokenData.User)
-		return &tokenData.Session
+		return &tokenData.Session, nil
 	}
-	return nil
-
+	return nil, services.NewError("SYS00030", uuid)
 }
 
 // Range go through all session entries
-func (df *DefaultJWTHandler) Range(f func(uuid, value any) bool) {
+func (df *DefaultJWTHandler) Range(f func(uuid, value any) bool) error {
 	df.uuidHashStore.Range(f)
+	return nil
 }
 
 // InvalidateUUID invalidate UUID entry and given elapsed time
@@ -59,7 +59,7 @@ func (df *DefaultJWTHandler) InvalidateUUID(uuid string, elapsed time.Time) bool
 }
 
 // Store store entry for given input
-func (df *DefaultJWTHandler) Store(principal PrincipalInterface, user, pass string) {
+func (df *DefaultJWTHandler) Store(principal PrincipalInterface, user, pass string) error {
 	created := time.Now()
 	log.Log.Infof("Adding UUID %s create %v", principal.UUID(), created)
 	df.uuidHashStore.Store(principal.UUID(),
@@ -67,7 +67,7 @@ func (df *DefaultJWTHandler) Store(principal PrincipalInterface, user, pass stri
 			User:     UserInfo{User: user, Created: created},
 			password: pass, content: principal,
 			session: principal.Session()})
-
+	return nil
 }
 
 // ValidateUUID validate JWT claims are in UUID session list
