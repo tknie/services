@@ -281,7 +281,7 @@ func TestEncryptDecript(t *testing.T) {
 	testData := "dfmsldkgfmlskdgndsl"
 	d, err := EncryptData(testData)
 	assert.NoError(t, err)
-	fmt.Println(d)
+	fmt.Println(len(d), ":", d)
 	s, err := DecryptData(d)
 	assert.NoError(t, err)
 	assert.Equal(t, testData, s)

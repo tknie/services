@@ -63,7 +63,7 @@ type UserInfo struct {
 type SessionInfo struct {
 	User        string `flynn:"Name"`
 	UUID        string `flynn:"UUID:PRIMARY KEY"`
-	Data        string
+	Data        []byte
 	Created     time.Time
 	LastAccess  time.Time
 	Invalidated time.Time
