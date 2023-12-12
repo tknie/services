@@ -443,6 +443,7 @@ func UUIDInfo(uuid string) (*SessionInfo, error) {
 	return JWTOperator.UUIDInfo(uuid)
 }
 
+// EncryptData encrypt data to base64 string
 func EncryptData(data string) (string, error) {
 	hash := sha512.New()
 	ciphertext, err := rsa.EncryptOAEP(hash, rand.Reader, &privateKey2.PublicKey, []byte(data), nil)
@@ -452,6 +453,7 @@ func EncryptData(data string) (string, error) {
 	return base64.StdEncoding.EncodeToString(ciphertext), nil
 }
 
+// DecryptData decsrypt base64 data to string
 func DecryptData(token string) (string, error) {
 	hash := sha512.New()
 	data, err := base64.StdEncoding.DecodeString(token)
