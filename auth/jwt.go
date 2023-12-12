@@ -12,8 +12,11 @@
 package auth
 
 import (
+	"crypto/rand"
 	"crypto/rsa"
+	"crypto/sha512"
 	"crypto/x509"
+	"encoding/base64"
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
@@ -438,4 +441,26 @@ func InvalidateUUID(uuid string, elapsed time.Time) bool {
 // UUIDInfo get UUID info User information
 func UUIDInfo(uuid string) (*SessionInfo, error) {
 	return JWTOperator.UUIDInfo(uuid)
+}
+
+func EncryptData(data string) (string, error) {
+	hash := sha512.New()
+	ciphertext, err := rsa.EncryptOAEP(hash, rand.Reader, &privateKey2.PublicKey, []byte(data), nil)
+	if err != nil {
+		return "", err
+	}
+	return base64.StdEncoding.EncodeToString(ciphertext), nil
+}
+
+func DecryptData(token string) (string, error) {
+	hash := sha512.New()
+	data, err := base64.StdEncoding.DecodeString(token)
+	if err != nil {
+		return "", err
+	}
+	plaintext, err := rsa.DecryptOAEP(hash, rand.Reader, privateKey2, data, nil)
+	if err != nil {
+		return "", err
+	}
+	return string(plaintext), nil
 }

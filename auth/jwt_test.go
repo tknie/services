@@ -268,3 +268,22 @@ func tokenWorker(t *testing.T, wt *WebToken) {
 		}
 	}
 }
+
+func TestEncryptDecript(t *testing.T) {
+	err := initLog("jwt.log")
+	if err != nil {
+		fmt.Println("ERROR : ", err)
+		return
+	}
+	wt := &WebToken{PrivateKey: "${CURDIR}/keys/apiKey.prv",
+		PublicKey: "${CURDIR}/keys/apiKey.pem", IssuerName: "TESTISSUER"}
+	wt.InitWebTokenJose2()
+	testData := "dfmsldkgfmlskdgndsl"
+	d, err := EncryptData(testData)
+	assert.NoError(t, err)
+	fmt.Println(d)
+	s, err := DecryptData(d)
+	assert.NoError(t, err)
+	assert.Equal(t, testData, s)
+
+}
