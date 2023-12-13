@@ -53,10 +53,10 @@ type WebToken struct {
 // UserInfo user information context
 type UserInfo struct {
 	User     string `flynn:"Name:PRIMARY KEY"`
-	Picture  string
 	EMail    string
 	LongName string
 	Created  time.Time
+	Picture  []byte
 }
 
 // SessionInfo session information context
