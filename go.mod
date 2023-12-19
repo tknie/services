@@ -5,10 +5,10 @@ go 1.19
 require (
 	github.com/fsnotify/fsnotify v1.7.0
 	github.com/go-ldap/ldap/v3 v3.4.6
-	github.com/go-openapi/errors v0.20.4
+	github.com/go-openapi/errors v0.21.0
 	github.com/google/uuid v1.5.0
 	github.com/mitchellh/go-ps v1.0.0
-	github.com/stretchr/testify v1.8.1
+	github.com/stretchr/testify v1.8.4
 	github.com/tknie/errorrepo v0.0.0-20231119173834-6ad8a3cefbc0
 	github.com/tknie/log v0.0.0-20231006083545-fabe25f4fb0e
 	github.com/tknie/pam v0.0.0-20221009204632-bfcf495c828d

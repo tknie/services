@@ -14,6 +14,8 @@ github.com/go-ldap/ldap/v3 v3.4.6 h1:ert95MdbiG7aWo/oPYp9btL3KJlMPKnP58r09rI8T+A
 github.com/go-ldap/ldap/v3 v3.4.6/go.mod h1:IGMQANNtxpsOzj7uUAMjpGBaOVTC4DYyIy8VsTdxmtc=
 github.com/go-openapi/errors v0.20.4 h1:unTcVm6PispJsMECE3zWgvG4xTiKda1LIR5rCRWLG6M=
 github.com/go-openapi/errors v0.20.4/go.mod h1:Z3FlZ4I8jEGxjUK+bugx3on2mIAk4txuAOhlsB1FSgk=
+github.com/go-openapi/errors v0.21.0 h1:FhChC/duCnfoLj1gZ0BgaBmzhJC2SL/sJr8a2vAobSY=
+github.com/go-openapi/errors v0.21.0/go.mod h1:jxNTMUxRCKj65yb/okJGEtahVd7uvWnuWfj53bse4ho=
 github.com/go-sql-driver/mysql v1.7.0 h1:ueSltNNllEqE3qcWBTD0iQd3IpL/6U+mJxLkazJ7YPc=
 github.com/go-sql-driver/mysql v1.7.0/go.mod h1:OXbVy3sEdcQ2Doequ6Z5BW6fXNQTmx+9S1MCJN5yJMI=
 github.com/google/go-cmp v0.5.9 h1:O2Tfq5qg4qc4AmwVlvv0oLiVAGB7enBSJ2x2DqQFi38=
@@ -52,6 +54,8 @@ github.com/stretchr/testify v1.7.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/
 github.com/stretchr/testify v1.8.0/go.mod h1:yNjHg4UonilssWZ8iaSj1OCr/vHnekPRkoO+kdMU+MU=
 github.com/stretchr/testify v1.8.1 h1:w7B6lhMri9wdJUVmEZPGGhZzrYTPvgJArz7wNPgYKsk=
 github.com/stretchr/testify v1.8.1/go.mod h1:w2LPCIKwWwSfY2zedu0+kehJoqGctiVI29o6fzry7u4=
+github.com/stretchr/testify v1.8.4 h1:CcVxjf3Q8PM0mHUKJCdn+eZZtm5yQwehR5yeSVQQcUk=
+github.com/stretchr/testify v1.8.4/go.mod h1:sz/lmYIOXD/1dqDmKjjqLyZ2RngseejIcXlSw2iwfAo=
 github.com/tknie/errorrepo v0.0.0-20231119173834-6ad8a3cefbc0 h1:Sny2q8i/eEF/2CpraU6kgYLwpUD11PC5aovw6vbvmcA=
 github.com/tknie/errorrepo v0.0.0-20231119173834-6ad8a3cefbc0/go.mod h1:lI2i/ZvgnOsoeJnzKbme2Cpa8lIs5ORgKILrtBwZyqk=
 github.com/tknie/log v0.0.0-20231006083545-fabe25f4fb0e h1:aNgWs7XTC4vcIcmzQT496neJexEvjx0Kv2/ho2xUlgo=
