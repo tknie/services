@@ -229,41 +229,6 @@ func (rfs *PasswordFileStruct) scan() (err error) {
 	return
 }
 
-// func (rfs *PasswordFileStruct) readFile(lineBreak string) (err error) {
-// 	b := make([]byte, 4096)
-// 	var buffer bytes.Buffer
-// 	var read int
-// 	count := 0
-// 	lineBuffer := ""
-// 	_, err = rfs.realmFd.Seek(0, 0)
-// 	if err != nil {
-// 		return
-// 	}
-// 	for err != io.EOF {
-// 		read, err = rfs.realmFd.Read(b)
-// 		if err == io.EOF {
-// 			return nil
-// 		}
-// 		if err != nil {
-// 			services.ServerMessage("Error scanning file %s after %d read: %v", rfs.realmFile, count, err)
-// 			return
-// 		}
-// 		_, err = buffer.Write(b[:read])
-// 		if err != nil {
-// 			services.ServerMessage("Error writing file %s: %v", rfs.realmFile, err)
-// 			return err
-// 		}
-// 		lineBuffer = lineBuffer + buffer.String()
-// 		n := strings.IndexAny(lineBuffer, lineBreak)
-// 		if n > 0 {
-// 			count += rfs.parseLine(lineBuffer[:n])
-// 			lineBuffer = lineBuffer[n:]
-// 		}
-// 	}
-// 	services.ServerMessage("Read %d new entries of file %s", count, rfs.realmFile)
-// 	return
-// }
-
 // parseLine and return count of new entries parsed
 func (rfs *PasswordFileStruct) parseLine(line string) int {
 	line = strings.TrimSpace(line)
@@ -305,7 +270,7 @@ func (rfs *PasswordFileStruct) parseLine(line string) int {
 			rfs.Counter++
 			count++
 		}
-		log.Log.Debugf("User auth for %s -> %s (%s)", entry.user, entry.password, entry.enc)
+		log.Log.Debugf("User auth for %s -> *** (%s)", entry.user, entry.enc)
 		return count
 	}
 	return 0
@@ -422,28 +387,6 @@ func (rfs *PasswordFileStruct) FlushUserToPasswordFile() error {
 	return err
 }
 
-// // Updater auth updater
-// func Updater(authentication *Authentication) {
-// 	for {
-// 		if authentication != nil {
-// 			for _, s := range authentication.AuthenticationServer {
-// 				if s.AuthMethod == FileMethod {
-// 					if defaultRealm == nil {
-// 						defaultRealm = NewInitFileRealm(s.Realm.File, true)
-// 					}
-// 					if defaultRealm != nil {
-// 						err := defaultRealm.LoadPasswordFile()
-// 						if err != nil {
-// 							fmt.Println("Load file realm data error", err)
-// 						}
-// 					}
-// 				}
-// 			}
-// 		}
-// 		time.Sleep(time.Duration(120) * time.Second)
-// 	}
-// }
-
 // CheckPasswordFileUser auth user and password for default realm
 func CheckPasswordFileUser(u, password string) (string, error) {
 	if len(passwordFileMap) == 0 {
@@ -468,8 +411,7 @@ func (rfs *PasswordFileStruct) CheckPasswordFileUser(u, password string) (string
 	if em, ok := rfs.loginMap.Load(user); ok {
 		e := em.(*loginEntry)
 		s := GenerateHash(e.enc, password)
-		log.Log.Debugf("Found user auth for %s -> %s (%s)", e.user, e.password, e.enc)
-		log.Log.Debugf("%s ALL: %s != %s", e.enc, s, e.password)
+		log.Log.Debugf("Found user auth for %s -> **** (%s)", e.user, e.enc)
 		if e.password == s {
 			return e.roles, nil
 		}
