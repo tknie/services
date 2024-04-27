@@ -128,7 +128,7 @@ func (sl *serverLogging) checkLogFile() error {
 	log.Log.Debugf("Message log exists: %s", sl.ServerLogName)
 	for x := 1; x < 10000; x++ {
 		slIndex := fmt.Sprintf("%s.%d", sl.ServerLogName, x)
-		log.Log.Debugf("Check Message log: %d", slIndex)
+		log.Log.Debugf("Check Message log: %s", slIndex)
 		if _, err := os.Stat(slIndex); err != nil {
 			if os.IsNotExist(err) {
 				return os.Rename(sl.ServerLogName, slIndex)

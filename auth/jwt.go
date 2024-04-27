@@ -58,7 +58,7 @@ type UserInfo struct {
 	Created       time.Time
 	LastLogin     time.Time
 	Picture       []byte
-	Permission    string
+	Permission    *User `flynn:":YAML"`
 	Administrator bool
 }
 
