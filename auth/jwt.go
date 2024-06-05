@@ -30,8 +30,8 @@ import (
 	"github.com/tknie/log"
 	"github.com/tknie/services"
 
-	jose "gopkg.in/square/go-jose.v2"
-	jwt "gopkg.in/square/go-jose.v2/jwt"
+	jose "github.com/go-jose/go-jose/v4"
+	jwt "github.com/go-jose/go-jose/v4/jwt"
 )
 
 var (
@@ -300,7 +300,7 @@ func (webToken *WebToken) GenerateJWToken(IAt string, principal PrincipalInterfa
 			log.Log.Debugf("Error create encrypter %v", err)
 			return "", err
 		}
-		tokenString, err = jwt.Encrypted(enc).Claims(claim).CompactSerialize()
+		tokenString, err = jwt.Encrypted(enc).Claims(claim).Serialize()
 		if err != nil {
 			log.Log.Debugf("Error create encrypted token: %v", err)
 			return "", err
@@ -313,7 +313,7 @@ func (webToken *WebToken) GenerateJWToken(IAt string, principal PrincipalInterfa
 		if err != nil {
 			return "", err
 		}
-		tokenString, err = jwt.Signed(signer).Claims(claim).CompactSerialize()
+		tokenString, err = jwt.Signed(signer).Claims(claim).Serialize()
 		if err != nil {
 			log.Log.Debugf("Error create signed token: %v", err)
 			return "", err
@@ -327,7 +327,7 @@ func (webToken *WebToken) GenerateJWToken(IAt string, principal PrincipalInterfa
 // use decrypt or signature check if configured
 func (webToken *WebToken) parseAndCheckToken2(token string) (*JWTClaims, error) {
 	if webToken.Encrypt {
-		tok, err := jose.ParseEncrypted(token)
+		tok, err := jose.ParseEncrypted(token, []jose.KeyAlgorithm{jose.RSA1_5}, []jose.ContentEncryption{jose.A128GCM})
 		if err != nil {
 			return nil, err
 		}
@@ -342,7 +342,7 @@ func (webToken *WebToken) parseAndCheckToken2(token string) (*JWTClaims, error) 
 		}
 		return out, nil
 	}
-	tok, err := jose.ParseSigned(token)
+	tok, err := jose.ParseSigned(token, []jose.SignatureAlgorithm{jose.PS512})
 	if err != nil {
 		return nil, err
 	}

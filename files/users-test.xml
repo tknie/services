@@ -28,4 +28,6 @@
   <Default read="*,!audit_data" write="" />
   <User name="tkn" read="*,!audit_data,#*" write="Album,Picture" />
   <User name="admin" read="*,audit_data,#*" write="Album,Picture" />
+  <Role name="writeUsers" read="*,#*" write="*,#*" />
+  <Role name="readUsers" read="*,#*" write="" />
 </Users>
