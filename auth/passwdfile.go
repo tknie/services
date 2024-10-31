@@ -217,7 +217,6 @@ func (rfs *PasswordFileStruct) scan() (err error) {
 	count := 0
 	for scanner.Scan() {
 		line := scanner.Text()
-		log.Log.Debugf("Scan line: %s", line)
 		count += rfs.parseLine(line)
 	}
 
