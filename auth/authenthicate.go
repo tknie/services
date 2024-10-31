@@ -22,19 +22,24 @@ import (
 // DefaultRoles default roles set for users
 var DefaultRoles = []string{}
 
-// Authenticate authenticate user and password
+// Authenticate authenticate using user and password adding roles to the principal
+// The principal interface need to be implemented to add roles corresponding to the
+// defined system. If system does not provide roles the DefaultRoles will be added
+// to principal instance
 func (service *AuthenticationServer) Authenticate(principal PrincipalInterface, user, passwd string) error {
 	log.Log.Debugf("Authenticate: %p -> %d", service, service.AuthMethod)
 	switch service.AuthMethod {
 	case FileMethod:
 		log.Log.Debugf("Password file service user %s", user)
-		roles, err := CheckPasswordFileUser(user, passwd)
-		principal.AddRoles(strings.Split(roles, ","))
+		roles, err := callPasswordFileUserAuthenticate(user, passwd)
+		if err == nil {
+			principal.AddRoles(strings.Split(roles, ","))
+		}
 		return err
 	case SystemMethod:
 		log.Log.Debugf("System service name %s", service.Module)
 		principal.AddRoles(DefaultRoles)
-		return SystemAuthenticate(service.Module, user, passwd)
+		return callSystemAuthenticate(service.Module, user, passwd)
 	case LDAPMethod:
 		principal.AddRoles(DefaultRoles)
 		return service.authLDAPRealm(user, passwd)
@@ -44,21 +49,21 @@ func (service *AuthenticationServer) Authenticate(principal PrincipalInterface, 
 	case SQLDatabaseMethod:
 		principal.AddRoles(DefaultRoles)
 		log.Log.Debugf("SQL database service name %s", service.Module)
-		return PerDatabase(service.Module, user, passwd)
+		return callDatabaseAuthenticate(service.Module, user, passwd)
 	case PluginMethod:
 		log.Log.Debugf("Plugin database service name %s", service.Module)
-		return CallbackAuthenticate(service, principal, user, passwd)
+		return callbackPluginAuthenticate(service, principal, user, passwd)
 	case CallbackMethod:
 		log.Log.Debugf("Plugin database service name %s", service.Module)
-		return CallbackAuthenticate(service, principal, user, passwd)
+		return callbackPluginAuthenticate(service, principal, user, passwd)
 	default:
-		log.Log.Debugf("Unknown service name %s", service.AuthMethod.Method())
+		log.Log.Debugf("Unknown service name %s", service.AuthMethod)
 	}
 	return errors.New("Authentication method error")
 }
 
-// Method used authorization method
-func (authMethod Method) Method() string {
+// Method used authorization method string info
+func (authMethod Method) String() string {
 	switch authMethod {
 	case SystemMethod:
 		return "System"

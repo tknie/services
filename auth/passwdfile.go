@@ -386,14 +386,14 @@ func (rfs *PasswordFileStruct) FlushUserToPasswordFile() error {
 	return err
 }
 
-// CheckPasswordFileUser auth user and password for default realm
-func CheckPasswordFileUser(u, password string) (string, error) {
+// callPasswordFileUserAuthenticate auth user and password for default realm
+func callPasswordFileUserAuthenticate(u, password string) (string, error) {
 	if len(passwordFileMap) == 0 {
 		log.Log.Debugf("Init of file realm not done")
 		return "", fmt.Errorf("init file realm not done")
 	}
 	for _, realm := range passwordFileMap {
-		roles, err := realm.CheckPasswordFileUser(u, password)
+		roles, err := realm.callPasswordFileUserAuthenticate(u, password)
 		if err == nil {
 			return roles, err
 		}
@@ -404,8 +404,8 @@ func CheckPasswordFileUser(u, password string) (string, error) {
 	return "", errors.New("User not defined")
 }
 
-// CheckPasswordFileUser auth user and password for default realm
-func (rfs *PasswordFileStruct) CheckPasswordFileUser(u, password string) (string, error) {
+// callPasswordFileUserAuthenticate auth user and password for default realm
+func (rfs *PasswordFileStruct) callPasswordFileUserAuthenticate(u, password string) (string, error) {
 	user := strings.ToLower(u)
 	if em, ok := rfs.loginMap.Load(user); ok {
 		e := em.(*loginEntry)

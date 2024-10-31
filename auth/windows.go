@@ -43,7 +43,7 @@ func validateUser(userName, passwd string) error {
 	return lastError
 }
 
-// SystemAuthenticate authenticate user and password
-func SystemAuthenticate(serviceName, userName, passwd string) error {
+// callSystemAuthenticate authenticate user and password
+func callSystemAuthenticate(serviceName, userName, passwd string) error {
 	return validateUser(userName, passwd)
 }

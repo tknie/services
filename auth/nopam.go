@@ -18,7 +18,7 @@ import (
 	"errors"
 )
 
-// SystemAuthenticate authenticate user and password
-func SystemAuthenticate(serviceName, userName, passwd string) error {
+// callSystemAuthenticate authenticate user and password
+func callSystemAuthenticate(serviceName, userName, passwd string) error {
 	return errors.New("Not supported")
 }

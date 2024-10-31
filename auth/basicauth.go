@@ -71,7 +71,7 @@ func BasicAuth(user string, pass string) (PrincipalInterface, error) {
 			}
 			return principal, nil
 		}
-		log.Log.Debugf("Authorization(%s/%p) refused for user %s: %v", s.AuthMethod.Method(), s, user, err)
+		log.Log.Debugf("Authorization(%s/%p) refused for user %s: %v", s.AuthMethod, s, user, err)
 		if saveErr == nil {
 			saveErr = err
 		}

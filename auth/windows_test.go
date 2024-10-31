@@ -21,6 +21,6 @@ import (
 )
 
 func TestWindowsLogin(t *testing.T) {
-	err := SystemAuthenticate("", "adatest@EUR", "XXXXYYYwrongPassword")
+	err := callSystemAuthenticate("", "adatest@EUR", "XXXXYYYwrongPassword")
 	assert.NoError(t, err)
 }

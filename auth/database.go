@@ -31,8 +31,8 @@ func RegisterDatabaseForAuth(layer, URL, query string) {
 	listAuthDatabase = append(listAuthDatabase, &authDatabase{layer, URL, query, true})
 }
 
-// PerDatabase authenticate user and password to database
-func PerDatabase(dbName, userName, passwd string) error {
+// callDatabaseAuthenticate authenticate user and password to database
+func callDatabaseAuthenticate(dbName, userName, passwd string) error {
 	log.Log.Debugf("Check %d auth databases", len(listAuthDatabase))
 	for _, ad := range listAuthDatabase {
 		adaptURL := os.ExpandEnv(ad.URL)

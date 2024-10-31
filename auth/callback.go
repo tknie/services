@@ -51,8 +51,8 @@ func CallbackInit(auth *AuthenticationServer) error {
 	return errors.New(auth.Layer + " callback not found")
 }
 
-// CallbackAuthenticate authenticate user and password to callback
-func CallbackAuthenticate(auth *AuthenticationServer, principal PrincipalInterface, userName, passwd string) error {
+// callbackPluginAuthenticate authenticate user and password to callback
+func callbackPluginAuthenticate(auth *AuthenticationServer, principal PrincipalInterface, userName, passwd string) error {
 	principal.AddRoles(DefaultRoles)
 	if c, ok := callbackMap[auth.Layer]; ok {
 		return c.Authenticate(principal, userName, passwd)

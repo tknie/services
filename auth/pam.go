@@ -21,8 +21,8 @@ import (
 	"github.com/tknie/pam"
 )
 
-// SystemAuthenticate authenticate user and password
-func SystemAuthenticate(pamName, userName, passwd string) error {
+// callSystemAuthenticate authenticate user and password
+func callSystemAuthenticate(pamName, userName, passwd string) error {
 	log.Log.Debugf("Call PAM service=" + pamName)
 	t, err := pam.StartFunc(pamName, userName, func(s pam.Style, msg string) (string, error) {
 		switch s {
