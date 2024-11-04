@@ -66,11 +66,6 @@ func BasicAuth(user string, pass string) (PrincipalInterface, error) {
 				return nil, err
 			}
 			evaluateRoles(principal)
-			_, err = GenerateJWToken(principal)
-			if err != nil {
-				log.Log.Errorf("Basic auth error... %v", err)
-				return nil, err
-			}
 			if log.IsDebugLevel() {
 				log.Log.Debugf("Create principal: %p", principal.Name)
 			}

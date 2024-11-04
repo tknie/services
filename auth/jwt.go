@@ -278,7 +278,7 @@ func (webToken *WebToken) GenerateJWToken(IAt string, principal PrincipalInterfa
 		return "", fmt.Errorf("web token not configured properly")
 	}
 	if webToken.OAuth2 {
-		return webToken.GenerateOIDCToken(IAt, principal)
+		return webToken.generateOIDCToken(IAt, principal)
 	}
 	token, err := generateCallbackToken(IAt, principal)
 	if err == nil {
@@ -373,7 +373,7 @@ func (webToken *WebToken) JWTContainsRoles(token string, scopes []string) (Princ
 		log.Log.Debugf("Has role scopes %#v", scopes)
 	}
 	if webToken.OAuth2 {
-		return webToken.OIDCContainsRoles(token, scopes)
+		return webToken.checkOIDCContainsRoles(token, scopes)
 	}
 	if webToken.PassToken != "" && token == webToken.PassToken {
 		si := &SessionInfo{UUID: webToken.PassToken}

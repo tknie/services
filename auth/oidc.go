@@ -24,6 +24,7 @@ import (
 var oauth2Config *oauth2.Config
 var provider *oidc.Provider
 
+// InitOIDC initialize basic parameters for OIDCS authentication
 func InitOIDC(auth *AuthenticationServer) error {
 	if auth == nil {
 		return errors.New("no OIDC client config given")
@@ -72,8 +73,8 @@ func (webToken *WebToken) InitWebTokenOIDC() error {
 	return nil
 }
 
-// GenerateJWToken generate JWT token using golang Jose.v2
-func (webToken *WebToken) GenerateOIDCToken(IAt string, principal PrincipalInterface) (tokenString string, err error) {
+// generateOIDCToken generate OIDC token using OAuth2 web instance
+func (webToken *WebToken) generateOIDCToken(IAt string, principal PrincipalInterface) (tokenString string, err error) {
 	token, ok := principal.Session().(oauth2.Token)
 	if !ok {
 		return "", errors.New("token generate OIDC mismatch")
@@ -81,7 +82,8 @@ func (webToken *WebToken) GenerateOIDCToken(IAt string, principal PrincipalInter
 	return token.AccessToken, nil
 }
 
-func (webToken *WebToken) OIDCContainsRoles(token string, scopes []string) (PrincipalInterface, error) {
+// checkOIDCContainsRoles OIDCS check for roles
+func (webToken *WebToken) checkOIDCContainsRoles(token string, scopes []string) (PrincipalInterface, error) {
 	verifier := provider.Verifier(&oidc.Config{ClientID: oauth2Config.ClientID})
 
 	// Parse and verify ID Token payload.
