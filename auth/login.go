@@ -58,6 +58,9 @@ func InitLoginService(auth *Authentication) error {
 		case SQLDatabaseMethod:
 			services.ServerMessage("Authentication using SQL database")
 			RegisterTargetForAuth(s.Layer, s.Target, s.Module)
+		case OIDCClientMethod:
+			services.ServerMessage("Authentication using OIDC client")
+			InitOIDC(s)
 		case PluginMethod:
 			services.ServerMessage("Authentication using plugin database")
 			err := CallbackInit(s)
@@ -93,6 +96,7 @@ func RemoveLoginService(auth *Authentication) {
 		case FileMethod:
 			RemovePasswordFile(s.PasswordFile)
 			services.ServerMessage("Remove Authentication password file type")
+		case OIDCClientMethod:
 		default:
 			log.Log.Debugf("Remove of authentication type %s not possible", s.Type)
 		}

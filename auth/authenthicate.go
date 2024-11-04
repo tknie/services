@@ -50,6 +50,9 @@ func (service *AuthenticationServer) Authenticate(principal PrincipalInterface, 
 		principal.AddRoles(DefaultRoles)
 		log.Log.Debugf("SQL database service name %s", service.Module)
 		return callDatabaseAuthenticate(service.Module, user, passwd)
+	case OIDCClientMethod:
+		log.Log.Debugf("Plugin database service name %s", service.Module)
+		return callbackOIDCAuthenticate(service, principal, user, passwd)
 	case PluginMethod:
 		log.Log.Debugf("Plugin database service name %s", service.Module)
 		return callbackPluginAuthenticate(service, principal, user, passwd)
@@ -75,6 +78,8 @@ func (authMethod Method) String() string {
 		return "OpenID"
 	case SQLDatabaseMethod:
 		return "SQL"
+	case OIDCClientMethod:
+		return "OIDC"
 	case PluginMethod:
 		return "Plugin"
 	case CallbackMethod:

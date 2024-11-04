@@ -42,6 +42,7 @@ var (
 // WebToken Web token configuration
 type WebToken struct {
 	Comment    string `xml:",comment" yaml:"-"`
+	OAuth2     bool   `xml:"oauth2,attr" yaml:"oauth2,omitempty"`
 	IssuerName string `xml:"issuer,attr" yaml:"issuer,omitempty"`
 	Expirer    string `xml:"expire,attr" yaml:"expire,omitempty"`
 	Encrypt    bool   `xml:"encrypt,attr" yaml:"encrypt,omitempty"`
@@ -218,6 +219,9 @@ func parseRSAPublicKeyFromPEM(key []byte) (*rsa.PublicKey, error) {
 
 // InitWebTokenJose2 initialize WebToken Jose.v2 token
 func (webToken *WebToken) InitWebTokenJose2() error {
+	if webToken.OAuth2 == true {
+		return webToken.InitWebTokenOIDC()
+	}
 	switch {
 	case webToken == nil:
 		return services.NewError("SYS00031")
@@ -272,6 +276,9 @@ func uuidStore(principal PrincipalInterface, user, pass string) error {
 func (webToken *WebToken) GenerateJWToken(IAt string, principal PrincipalInterface) (tokenString string, err error) {
 	if webToken == nil {
 		return "", fmt.Errorf("web token not configured properly")
+	}
+	if webToken.OAuth2 {
+		return webToken.GenerateOIDCToken(IAt, principal)
 	}
 	token, err := generateCallbackToken(IAt, principal)
 	if err == nil {
@@ -364,6 +371,9 @@ func (webToken *WebToken) parseAndCheckToken2(token string) (*JWTClaims, error) 
 func (webToken *WebToken) JWTContainsRoles(token string, scopes []string) (PrincipalInterface, error) {
 	if log.IsDebugLevel() {
 		log.Log.Debugf("Has role scopes %#v", scopes)
+	}
+	if webToken.OAuth2 {
+		return webToken.OIDCContainsRoles(token, scopes)
 	}
 	if webToken.PassToken != "" && token == webToken.PassToken {
 		si := &SessionInfo{UUID: webToken.PassToken}

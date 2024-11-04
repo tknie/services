@@ -51,6 +51,8 @@ const (
 	SQLDatabaseMethod
 	// PluginMethod plugin method
 	PluginMethod
+	// OIDCClientMethod use OIDC client
+	OIDCClientMethod
 	// CallbackMethod callback method
 	CallbackMethod
 )
@@ -69,6 +71,8 @@ func MethodType(s string) Method {
 		return SQLDatabaseMethod
 	case "ldap":
 		return LDAPMethod
+	case "oidc":
+		return OIDCClientMethod
 	case "plugin":
 		return PluginMethod
 	case "callback":
@@ -90,6 +94,10 @@ type AuthenticationServer struct {
 	Layer        string   `xml:"driver,attr" yaml:"driver,omitempty"`
 	AuthMethod   Method   `xml:"-" yaml:"-"`
 	Target       string   `xml:"target,omitempty" yaml:"target,omitempty"`
+	ClientID     string   `xml:"clientID,omitempty" yaml:"clientID,omitempty"`
+	ClientSecret string   `xml:"clientSecret,omitempty" yaml:"clientSecret,omitempty"`
+	URL          string   `xml:"url,omitempty" yaml:"url,omitempty"`
+	RedirectURL  string   `xml:"redirectUrl,omitempty" yaml:"redirectUrl,omitempty"`
 	PasswordFile string   `xml:"passwordFile,omitempty" yaml:"passwordFile,omitempty"`
 	LDAP         []Source `xml:"LDAP,omitempty" yaml:"LDAP,omitempty"`
 }
