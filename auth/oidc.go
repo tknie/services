@@ -23,7 +23,7 @@ import (
 var oauth2Config *oauth2.Config
 var provider *oidc.Provider
 
-type claimsJson struct {
+type claimsJSON struct {
 	Expiry            int32  `json:"exp"`
 	IssuedAt          int32  `json:"iat"`
 	JTI               string `json:"jti"`
@@ -115,7 +115,7 @@ func (webToken *WebToken) checkOIDCContainsRoles(token string, scopes []string) 
 	log.Log.Debugf("ID token %#v", idToken)
 
 	// Extract custom claims
-	claims := &claimsJson{}
+	claims := &claimsJSON{}
 	if err := idToken.Claims(claims); err != nil {
 		return nil, err
 	}
