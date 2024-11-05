@@ -14,7 +14,6 @@ package auth
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/coreos/go-oidc"
 	"github.com/tknie/log"
@@ -23,6 +22,27 @@ import (
 
 var oauth2Config *oauth2.Config
 var provider *oidc.Provider
+
+type claimsJson struct {
+	Expiry            int32  `json:"exp"`
+	IssuedAt          int32  `json:"iat"`
+	JTI               string `json:"jti"`
+	ISS               string `json:"iss"`
+	AUD               string `json:"aud"`
+	Sub               string `json:"sub"`
+	TYP               string `json:"typ"`
+	AZP               string `json:"azp"`
+	SessionState      string `json:"session_state"`
+	ACR               string `json:"acr"`
+	SID               string `json:"sid"`
+	EMailVerified     bool   `json:"email_verified"`
+	Name              string `json:"name"`
+	LastAuth          int32  `json:"last_auth"`
+	PreferredUsername string `json:"preferred_username"`
+	GivenName         string `json:"given_name"`
+	FamilyName        string `json:"family_name"`
+	EMail             string `json:"email"`
+}
 
 // InitOIDC initialize basic parameters for OIDCS authentication
 func InitOIDC(auth *AuthenticationServer) error {
@@ -63,7 +83,7 @@ func callbackOIDCAuthenticate(auth *AuthenticationServer, principal PrincipalInt
 	if err != nil {
 		return err
 	}
-	principal.SetRemote("XX")
+	principal.SetRemote(auth.URL)
 	principal.SetSession(token)
 	return nil
 }
@@ -75,7 +95,7 @@ func (webToken *WebToken) InitWebTokenOIDC() error {
 
 // generateOIDCToken generate OIDC token using OAuth2 web instance
 func (webToken *WebToken) generateOIDCToken(IAt string, principal PrincipalInterface) (tokenString string, err error) {
-	token, ok := principal.Session().(oauth2.Token)
+	token, ok := principal.Session().(*oauth2.Token)
 	if !ok {
 		return "", errors.New("token generate OIDC mismatch")
 	}
@@ -91,16 +111,16 @@ func (webToken *WebToken) checkOIDCContainsRoles(token string, scopes []string) 
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("Check token: " + token)
-	fmt.Printf("ID token %#v\n", idToken)
+	log.Log.Debugf("Check token: " + token)
+	log.Log.Debugf("ID token %#v", idToken)
 
 	// Extract custom claims
-	var claims struct {
-		Email    string `json:"email"`
-		Verified bool   `json:"email_verified"`
-	}
-	if err := idToken.Claims(&claims); err != nil {
+	claims := &claimsJson{}
+	if err := idToken.Claims(claims); err != nil {
 		return nil, err
 	}
-	return nil, errors.New("OIDC not implemented")
+	log.Log.Debugf("Claims %#v", claims)
+	p := PrincipalCreater(&SessionInfo{User: claims.EMail, UUID: claims.SID},
+		claims.EMail, token)
+	return p, nil
 }

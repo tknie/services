@@ -40,6 +40,7 @@ type testPrincipal struct {
 	token    string
 	user     string
 	pass     string
+	session  interface{}
 }
 
 func (tp *testPrincipal) UUID() string {
@@ -64,9 +65,10 @@ func (tp *testPrincipal) Roles() []string {
 	return []string{"xx", testRole}
 }
 func (tp *testPrincipal) Session() interface{} {
-	return nil
+	return tp.session
 }
-func (tp *testPrincipal) SetSession(interface{}) {
+func (tp *testPrincipal) SetSession(session interface{}) {
+	tp.session = session
 }
 
 func newWinFileSink(u *url.URL) (zap.Sink, error) {
