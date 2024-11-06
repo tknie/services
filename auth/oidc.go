@@ -14,6 +14,7 @@ package auth
 import (
 	"context"
 	"errors"
+	"os"
 
 	"github.com/coreos/go-oidc"
 	"github.com/tknie/log"
@@ -49,11 +50,14 @@ func InitOIDC(auth *AuthenticationServer) error {
 	if auth == nil {
 		return errors.New("no OIDC client config given")
 	}
-	if auth.ClientID == "" || auth.ClientSecret == "" || auth.URL == "" {
+	clientID := os.ExpandEnv(auth.ClientID)
+	clientSecret := os.ExpandEnv(auth.ClientSecret)
+	url := os.ExpandEnv(auth.URL)
+	if clientID == "" || clientSecret == "" || url == "" {
 		return errors.New("no OIDC client config details given")
 	}
 	var err error
-	provider, err = oidc.NewProvider(context.Background(), auth.URL)
+	provider, err = oidc.NewProvider(context.Background(), url)
 	if err != nil {
 		log.Log.Debugf("Provider error: %s", err)
 		return err
@@ -61,8 +65,8 @@ func InitOIDC(auth *AuthenticationServer) error {
 
 	// Configure an OpenID Connect aware OAuth2 client.
 	oauth2Config = &oauth2.Config{
-		ClientID:     auth.ClientID,
-		ClientSecret: auth.ClientSecret,
+		ClientID:     clientID,
+		ClientSecret: clientSecret,
 		// RedirectURL:  OIDCClient.RedirectURL,
 
 		// Discovery returns the OAuth2 endpoints.

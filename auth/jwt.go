@@ -395,25 +395,15 @@ func (webToken *WebToken) JWTContainsRoles(token string, scopes []string) (Princ
 			issuer = WebTokenConfig.IssuerName
 		}
 		if claims.Issuer == issuer {
-			isInScopes := false
+			// isInScopes := false
 			//claimedRoles := []string{}
-			for _, scope := range scopes {
-				for _, role := range claims.Roles {
-					if log.IsDebugLevel() {
-						log.Log.Debugf("Check role %v in scope %v", role, scope)
-					}
-					if role == scope {
-						isInScopes = true
-						// we enrich the principal with all claimed roles within scope (hence: not breaking here)
-						//claimedRoles = append(claimedRoles, role)
-					}
-				}
-			}
+			isInScopes := checkInScope(scopes, claims.Roles)
+
 			if !isInScopes {
 				if log.IsDebugLevel() {
 					log.Log.Debugf("Role error", claims.UUID)
 				}
-				services.ServerMessage(fmt.Sprintf("Unauthorized token (Role error): %v", err))
+				services.ServerMessage(fmt.Sprintf("Unauthorized token (Role error): %v", claims.UUID))
 				return nil, errors.New(http.StatusUnauthorized, "Unauthorized.")
 			}
 			if log.IsDebugLevel() {
@@ -440,6 +430,23 @@ func (webToken *WebToken) JWTContainsRoles(token string, scopes []string) (Princ
 	services.ServerMessage("Unauthorized token (Claim error): %v", err)
 
 	return nil, errors.New(http.StatusUnauthorized, "Unauthorized: invalid Bearer token: %v", err)
+}
+
+func checkInScope(scopes, roles []string) bool {
+	for _, scope := range scopes {
+		for _, role := range roles {
+			if log.IsDebugLevel() {
+				log.Log.Debugf("Check role %v in scope %v", role, scope)
+			}
+			if role == scope {
+				// isInScopes = true
+				// we enrich the principal with all claimed roles within scope (hence: not breaking here)
+				//claimedRoles = append(claimedRoles, role)
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func validUUID(claims *JWTClaims) (PrincipalInterface, bool) {
