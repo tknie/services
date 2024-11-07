@@ -55,7 +55,7 @@ func InitOIDC(auth *AuthenticationServer) error {
 	clientSecret := os.ExpandEnv(auth.ClientSecret)
 	url := os.ExpandEnv(auth.URL)
 	if clientID == "" || clientSecret == "" || url == "" {
-		log.Log.Debugf("o OIDC client config details given")
+		log.Log.Debugf("no OIDC client config details given")
 		return errors.New("no OIDC client config details given")
 	}
 	var err error
@@ -122,17 +122,19 @@ func (webToken *WebToken) checkOIDCContainsRoles(token string, scopes []string) 
 	}
 	verifier := provider.Verifier(&oidc.Config{ClientID: oauth2Config.ClientID})
 
+	log.Log.Debugf("Verify OIDC token: %s", token)
 	// Parse and verify ID Token payload.
 	idToken, err := verifier.Verify(context.Background(), token)
 	if err != nil {
+		log.Log.Debugf("Verify error: %v", err)
 		return nil, err
 	}
-	log.Log.Debugf("Check token: " + token)
 	log.Log.Debugf("ID token %#v", idToken)
 
 	// Extract custom claims
 	claims := &claimsJSON{}
 	if err := idToken.Claims(claims); err != nil {
+		log.Log.Debugf("Verify error evaluating claims: %v", err)
 		return nil, err
 	}
 	log.Log.Debugf("Claims %#v", claims)
