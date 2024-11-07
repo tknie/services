@@ -48,12 +48,14 @@ type claimsJSON struct {
 // InitOIDC initialize basic parameters for OIDCS authentication
 func InitOIDC(auth *AuthenticationServer) error {
 	if auth == nil {
+		log.Log.Debugf("no OIDC client config given during init")
 		return errors.New("no OIDC client config given")
 	}
 	clientID := os.ExpandEnv(auth.ClientID)
 	clientSecret := os.ExpandEnv(auth.ClientSecret)
 	url := os.ExpandEnv(auth.URL)
 	if clientID == "" || clientSecret == "" || url == "" {
+		log.Log.Debugf("o OIDC client config details given")
 		return errors.New("no OIDC client config details given")
 	}
 	var err error
@@ -75,12 +77,14 @@ func InitOIDC(auth *AuthenticationServer) error {
 		// "openid" is a required scope for OpenID Connect flows.
 		Scopes: []string{oidc.ScopeOpenID, "profile", "email"},
 	}
+	log.Log.Debugf("OIDC initialized for client ID = %s", clientID)
 	return nil
 }
 
 // callbackOIDCAuthenticate authenticate user and password to OIDC client
 func callbackOIDCAuthenticate(auth *AuthenticationServer, principal PrincipalInterface, userName, passwd string) error {
 	if oauth2Config == nil {
+		log.Log.Debugf("no OIDC client config given during authenticate")
 		return errors.New("no OIDC configured")
 	}
 	token, err := oauth2Config.PasswordCredentialsToken(context.Background(), userName, passwd)
@@ -108,6 +112,14 @@ func (webToken *WebToken) generateOIDCToken(IAt string, principal PrincipalInter
 
 // checkOIDCContainsRoles OIDCS check for roles
 func (webToken *WebToken) checkOIDCContainsRoles(token string, scopes []string) (PrincipalInterface, error) {
+	if oauth2Config == nil {
+		log.Log.Debugf("no OIDC client config given during check")
+		return nil, errors.New("no OIDC config configured")
+	}
+	if provider == nil {
+		log.Log.Debugf("no OIDC client provider given during check")
+		return nil, errors.New("no OIDC provider configured")
+	}
 	verifier := provider.Verifier(&oidc.Config{ClientID: oauth2Config.ClientID})
 
 	// Parse and verify ID Token payload.
