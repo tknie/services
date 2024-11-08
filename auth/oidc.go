@@ -17,6 +17,7 @@ import (
 	"os"
 
 	"github.com/coreos/go-oidc"
+	"github.com/google/uuid"
 	"github.com/tknie/log"
 	"golang.org/x/oauth2"
 )
@@ -89,10 +90,11 @@ func callbackOIDCAuthenticate(auth *AuthenticationServer, principal PrincipalInt
 	}
 	token, err := oauth2Config.PasswordCredentialsToken(context.Background(), userName, passwd)
 	if err != nil {
+		log.Log.Debugf("OIDC Password token check fails: %v", err)
 		return err
 	}
 	principal.SetRemote(auth.URL)
-	principal.SetSession(token)
+	principal.SetSession(&SessionInfo{User: userName, UUID: uuid.New().String(), token: token})
 	return nil
 }
 
@@ -103,9 +105,13 @@ func (webToken *WebToken) InitWebTokenOIDC() error {
 
 // generateOIDCToken generate OIDC token using OAuth2 web instance
 func (webToken *WebToken) generateOIDCToken(IAt string, principal PrincipalInterface) (tokenString string, err error) {
-	token, ok := principal.Session().(*oauth2.Token)
+	session, ok := principal.Session().(*SessionInfo)
 	if !ok {
-		return "", errors.New("token generate OIDC mismatch")
+		return "", errors.New("session memory entry OIDC mismatch")
+	}
+	token, ok := session.token.(*oauth2.Token)
+	if !ok {
+		return "", errors.New("token memory entry OIDC mismatch")
 	}
 	return token.AccessToken, nil
 }
@@ -138,7 +144,8 @@ func (webToken *WebToken) checkOIDCContainsRoles(token string, scopes []string) 
 		return nil, err
 	}
 	log.Log.Debugf("Claims %#v", claims)
-	p := PrincipalCreater(&SessionInfo{User: claims.EMail, UUID: claims.SID},
+	p := PrincipalCreater(&SessionInfo{User: claims.EMail, UUID: uuid.New().String(), token: idToken},
 		claims.EMail, token)
+	log.Log.Debugf("Scope check %#v ignored", scopes)
 	return p, nil
 }

@@ -71,6 +71,7 @@ type SessionInfo struct {
 	Created     time.Time
 	LastAccess  time.Time
 	Invalidated time.Time
+	token       interface{}
 }
 
 type jsonWebTokenData struct {
