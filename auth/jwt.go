@@ -71,7 +71,7 @@ type SessionInfo struct {
 	Created     time.Time
 	LastAccess  time.Time
 	Invalidated time.Time
-	token       interface{}
+	token       interface{} `flynn:":ignore"`
 }
 
 type jsonWebTokenData struct {
