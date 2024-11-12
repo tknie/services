@@ -14,7 +14,6 @@ package auth
 import (
 	"encoding/json"
 	"encoding/xml"
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -155,14 +154,14 @@ func init() {
 			case adminEvent := <-adminWatcher.Events:
 				u, err := loadUser(adminEvent.Name)
 				if err != nil {
-					fmt.Println("Error loading admin user:", err)
+					services.ServerMessage("Error loading admin user: %v", err)
 				} else {
 					AllowedAdministrators = u
 				}
 			case userEvent := <-userWatcher.Events:
 				u, err := loadUser(userEvent.Name)
 				if err != nil {
-					fmt.Println("Error loading admin user:", err)
+					services.ServerMessage("Error loading users: %v", err)
 				} else {
 					AllowedUsers = u
 				}
@@ -407,7 +406,6 @@ func loadUser(file string) (*Users, error) {
 			u.UserMap[us.Name] = us
 		}
 	}
-	fmt.Printf("-> %#v\n", u)
 	return u, nil
 }
 
