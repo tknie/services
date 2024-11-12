@@ -25,7 +25,7 @@ import (
 
 const (
 	// TimeFormat time format schema
-	TimeFormat = "2006-01-02 15:04:05.000"
+	TimeFormat = "2006/01/02 15:04:05.000"
 )
 
 // MessageReference default message reference

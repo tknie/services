@@ -12,14 +12,17 @@
 package auth
 
 import (
+	"encoding/json"
 	"encoding/xml"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/tknie/log"
 	"github.com/tknie/services"
+	"gopkg.in/yaml.v3"
 )
 
 // AccessRole access role
@@ -350,18 +353,46 @@ func evaluateRoles(principal PrincipalInterface) {
 
 func loadUser(file string) (*Users, error) {
 	fileEnvResolved := os.ExpandEnv(file)
+
+	ext := strings.ToLower(filepath.Ext(file))
+
 	data, err := services.ReadConfig(fileEnvResolved)
 	if err != nil {
 		log.Log.Debugf("Error opening role list: %v", err)
 		services.ServerMessage("Warning: Error reading config %s: %v", file, err)
 		return nil, err
 	}
+
 	u := &Users{File: file, UserMap: make(map[string]*User)}
-	err = xml.Unmarshal(data, u)
-	if err != nil {
-		log.Log.Debugf("Unmarshal error: %#v", err)
-		services.ServerMessage("Warning: error parsing %s list: %v", file, err)
-		return nil, err
+	switch ext {
+	case ".xml":
+		err = xml.Unmarshal(data, u)
+		if err != nil {
+			log.Log.Debugf("Unmarshal error: %#v", err)
+			services.ServerMessage("Warning: error parsing %s list: %v", file, err)
+			return nil, err
+		}
+	case ".json":
+		err = json.Unmarshal(data, u)
+		if err != nil {
+			log.Log.Debugf("Unmarshal error: %#v", err)
+			services.ServerMessage("Warning: error parsing %s list: %v", file, err)
+			return nil, err
+		}
+	case ".yaml":
+		err = yaml.Unmarshal(data, u)
+		if err != nil {
+			log.Log.Debugf("Unmarshal error: %#v", err)
+			services.ServerMessage("Warning: error parsing %s list: %v", file, err)
+			return nil, err
+		}
+	default:
+		err = xml.Unmarshal(data, u)
+		if err != nil {
+			log.Log.Debugf("Unmarshal error: %#v", err)
+			services.ServerMessage("Warning: error parsing %s list: %v", file, err)
+			return nil, err
+		}
 	}
 	if u.Default != nil {
 		u.Default.ReadMap = generatePermisionMap(u.Default.Read, nil)
@@ -376,6 +407,7 @@ func loadUser(file string) (*Users, error) {
 			u.UserMap[us.Name] = us
 		}
 	}
+	fmt.Printf("-> %#v\n", u)
 	return u, nil
 }
 
@@ -404,4 +436,10 @@ func LoadUsers(role AccessRole, file string) error {
 	}
 
 	return nil
+}
+
+// ClearUsers clear permission rights
+func ClearUsers() {
+	AllowedAdministrators = nil
+	AllowedUsers = nil
 }

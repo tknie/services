@@ -17,10 +17,53 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCheckUser(t *testing.T) {
+func TestCheckUserWithXML(t *testing.T) {
+	ClearUsers()
 	err := LoadUsers(UserRole, "${CURDIR}/files/users-test.xml")
 	assert.NoError(t, err)
 	err = LoadUsers(AdministratorRole, "${CURDIR}/files/administrators-test.xml")
+	assert.NoError(t, err)
+	assert.False(t, ValidUser(UserRole, false, nil, "abc"))
+	assert.False(t, ValidUser(UserRole, false, &UserInfo{}, "abc"))
+	assert.False(t, ValidUser(UserRole, false, &UserInfo{User: "tkn"}, ""))
+	assert.True(t, ValidUser(UserRole, false, &UserInfo{User: "user1"}, "db"))
+	assert.False(t, ValidUser(UserRole, false, &UserInfo{User: "user1"}, "audit_data"))
+	assert.True(t, ValidUser(UserRole, false, &UserInfo{User: "admin"}, "audit_data"))
+	assert.False(t, ValidUser(UserRole, false, &UserInfo{User: "tkn"}, "audit_data"))
+	assert.True(t, ValidUser(AdministratorRole, false, &UserInfo{User: "tkn"}, "audit_data"))
+	assert.True(t, ValidUser(AdministratorRole, true, &UserInfo{User: "tkn"}, "audit_data"))
+	assert.False(t, ValidUser(AdministratorRole, true, &UserInfo{User: "user1"}, "abc"))
+	assert.True(t, ValidAdmin("admin"))
+	assert.False(t, ValidAdmin("user1"))
+	assert.False(t, ValidAdmin(""))
+}
+
+func xTestCheckUserWithJSON(t *testing.T) {
+	ClearUsers()
+	err := LoadUsers(UserRole, "${CURDIR}/files/users-test.json")
+	assert.NoError(t, err)
+	err = LoadUsers(AdministratorRole, "${CURDIR}/files/administrators-test.json")
+	assert.NoError(t, err)
+	assert.False(t, ValidUser(UserRole, false, nil, "abc"))
+	assert.False(t, ValidUser(UserRole, false, &UserInfo{}, "abc"))
+	assert.False(t, ValidUser(UserRole, false, &UserInfo{User: "tkn"}, ""))
+	assert.True(t, ValidUser(UserRole, false, &UserInfo{User: "user1"}, "db"))
+	assert.False(t, ValidUser(UserRole, false, &UserInfo{User: "user1"}, "audit_data"))
+	assert.True(t, ValidUser(UserRole, false, &UserInfo{User: "admin"}, "audit_data"))
+	assert.False(t, ValidUser(UserRole, false, &UserInfo{User: "tkn"}, "audit_data"))
+	assert.True(t, ValidUser(AdministratorRole, false, &UserInfo{User: "tkn"}, "audit_data"))
+	assert.True(t, ValidUser(AdministratorRole, true, &UserInfo{User: "tkn"}, "audit_data"))
+	assert.False(t, ValidUser(AdministratorRole, true, &UserInfo{User: "user1"}, "abc"))
+	assert.True(t, ValidAdmin("admin"))
+	assert.False(t, ValidAdmin("user1"))
+	assert.False(t, ValidAdmin(""))
+}
+
+func TestCheckUserWithYAML(t *testing.T) {
+	ClearUsers()
+	err := LoadUsers(UserRole, "${CURDIR}/files/users-test.yaml")
+	assert.NoError(t, err)
+	err = LoadUsers(AdministratorRole, "${CURDIR}/files/administrators-test.yaml")
 	assert.NoError(t, err)
 	assert.False(t, ValidUser(UserRole, false, nil, "abc"))
 	assert.False(t, ValidUser(UserRole, false, &UserInfo{}, "abc"))
