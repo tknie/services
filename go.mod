@@ -13,9 +13,9 @@ require (
 	github.com/tknie/log v0.0.0-20231006083545-fabe25f4fb0e
 	github.com/tknie/pam v0.0.0-20221009204632-bfcf495c828d
 	go.uber.org/zap v1.27.0
-	golang.org/x/oauth2 v0.23.0
-	golang.org/x/sys v0.26.0
-	golang.org/x/text v0.19.0
+	golang.org/x/oauth2 v0.24.0
+	golang.org/x/sys v0.27.0
+	golang.org/x/text v0.20.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
 
@@ -27,7 +27,7 @@ require (
 	github.com/pquerna/cachecontrol v0.2.0 // indirect
 	github.com/rogpeppe/go-internal v1.9.0 // indirect
 	golang.org/x/net v0.27.0 // indirect
-	golang.org/x/sync v0.8.0 // indirect
+	golang.org/x/sync v0.9.0 // indirect
 	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
 )
 
@@ -42,6 +42,6 @@ require (
 	github.com/msteinert/pam v1.1.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/crypto v0.28.0 // indirect
+	golang.org/x/crypto v0.29.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1
 )
