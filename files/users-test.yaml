@@ -1,0 +1,40 @@
+# This configuration file defines permission per user.
+# The configuration are based on view, tables and databases
+# used. For direct access to the database resources, the corresponding
+# DatabaseAccesss database entry need to be entered.
+# Default contains all standard default configuration.
+# Entries are comma separated. The entries started with the # are database id
+# entries.
+# - '*' means all tables and views are accessable
+# - '#*' means all database id's are accessable
+# - '!secret_table' means exclude access to secret_table
+# - The write tag defines update, delete and store permissions
+# - An empty 'read' or 'write' configuration defines no permissions
+# - The user name need to be part of the corresponding authentication
+#   instance. It need to be part of realm.properties if the realm
+#   authentication is used.
+# - Because of security reason this file is not update through the
+#   RESTful API
+
+#  Examples:
+#   - read="*,#*" Read access to all views or tables and do direct database
+#     access to all databases
+#   - write="employees,#*" Write access to table 'employees' and to
+#     all databases.
+default:
+  read: "*,!audit_data"
+  write: ""
+user:
+  - name: "tkn"
+    read: "*,!audit_data,#*"
+    write: "Album,Picture"
+  - name: "admin"
+    read: "*,audit_data,#*"
+    write: "Album,Picture"
+  - name: "writeUsers"
+    read: "*,#*"
+    write: "*,#*"
+role:
+  name: "readUsers"
+  read: "*,#*"
+  write: ""

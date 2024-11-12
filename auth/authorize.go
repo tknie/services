@@ -118,17 +118,17 @@ type User struct {
 type Default struct {
 	Read     string          `xml:"read,attr"  yaml:"read"`
 	Write    string          `xml:"write,attr" yaml:"write"`
-	ReadMap  map[string]bool `xml:"-" yaml:"-"`
-	WriteMap map[string]bool `xml:"-" yaml:"-"`
+	ReadMap  map[string]bool `xml:"-" yaml:"-" json:"-"`
+	WriteMap map[string]bool `xml:"-" yaml:"-" json:"-"`
 }
 
 // Users REST user list allowed accessing data
 type Users struct {
-	Role    AccessRole       `xml:"-" yaml:"-"`
-	File    string           `xml:"-" yaml:"-"`
+	Role    AccessRole       `xml:"-" yaml:"-" json:"-"`
+	File    string           `xml:"-" yaml:"-" json:"-"`
 	Default *Default         `xml:"Default" yaml:"default,omitempty"`
 	User    []*User          `xml:"User"  yaml:"user,omitempty"`
-	UserMap map[string]*User `xml:"-" yaml:"-"`
+	UserMap map[string]*User `xml:"-" yaml:"-" json:"-"`
 }
 
 var roleNames = []string{"Administrator", "User"}

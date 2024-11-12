@@ -1,0 +1,30 @@
+{
+  "Default": {
+    "Read": "*,!audit_data",
+    "Write": ""
+  },
+  "User": [
+    {
+      "Name": "tkn",
+      "Read": "*,!audit_data,#*",
+      "Write": "Album,Picture"
+    },
+    {
+      "Name": "admin",
+      "Read": "*,audit_data,#*",
+      "Write": "Album,Picture"
+    }
+  ],
+  "Role": [
+    {
+      "Name": "writeUsers",
+      "Read": "*,#*",
+      "Write": "*,#*"
+    },
+    {
+      "Name": "readUsers",
+      "Read": "*,#*",
+      "Write": ""
+    }
+  ]
+}

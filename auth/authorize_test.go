@@ -12,6 +12,8 @@
 package auth
 
 import (
+	"encoding/json"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -38,8 +40,12 @@ func TestCheckUserWithXML(t *testing.T) {
 	assert.False(t, ValidAdmin(""))
 }
 
-func xTestCheckUserWithJSON(t *testing.T) {
+func TestCheckUserWithJSON(t *testing.T) {
 	ClearUsers()
+	users := Users{User: []*User{&User{Name: "abc"}}}
+	v, _ := json.Marshal(users)
+	fmt.Println(">>>", string(v))
+
 	err := LoadUsers(UserRole, "${CURDIR}/files/users-test.json")
 	assert.NoError(t, err)
 	err = LoadUsers(AdministratorRole, "${CURDIR}/files/administrators-test.json")

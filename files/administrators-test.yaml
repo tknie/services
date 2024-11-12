@@ -1,0 +1,9 @@
+# This configuration file defines administration permission per user.
+# Each 'User' defined below the 'Users' tag has administration rights.
+# This includes administration operations and the user can
+# control job tasks.
+# Because of security reason this file is not update through the
+# RESTful API
+user:
+  - name: "admin"
+  - name: "tkn"
