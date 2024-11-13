@@ -16,7 +16,7 @@ import (
 	"errors"
 	"os"
 
-	"github.com/coreos/go-oidc"
+	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/google/uuid"
 	"github.com/tknie/log"
 	"golang.org/x/oauth2"
