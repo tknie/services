@@ -170,7 +170,7 @@ func (xlog *Logging) InitTraceLogging() {
 	logger := zap.New(core)
 	defer logger.Sync()
 	sugar := logger.Sugar()
-	log.Log = sugar
+	log.InitLog(sugar)
 	log.Log.Infof("Start tracing of service or application")
 	log.Log.Infof("Logging config: %#v", xlog)
 	ServerMessage("Trace '" + xlog.LogLevel + "' log send to " + logName)

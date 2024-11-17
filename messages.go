@@ -110,7 +110,7 @@ func (xlog *Logging) OpenMessageLog() {
 		ServerMessage("Error opening message log file in %v -> %s: %v"+LineBreak, wd, xlog.ServerLocation, sLogFileErr)
 		os.Exit(1)
 	}
-	ServerMessage("Output messages send to " + xlog.ServerLocation)
+	ServerMessage("Write output messages to " + xlog.ServerLocation)
 }
 
 // CloseMessageLog Close message log

@@ -139,7 +139,7 @@ func initLog(fileName string) (err error) {
 	sugar := logger.Sugar()
 
 	sugar.Infof("logger construction succeeded %s", "xx")
-	log.Log = sugar
+	log.InitLog(sugar)
 
 	return
 }
