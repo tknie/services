@@ -9,7 +9,7 @@ require (
 	github.com/go-openapi/errors v0.22.0
 	github.com/google/uuid v1.6.0
 	github.com/mitchellh/go-ps v1.0.0
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	github.com/tknie/errorrepo v0.0.0-20240912184714-682ebdc389d9
 	github.com/tknie/log v0.0.0-20241117202403-65556e62b83d
 	github.com/tknie/pam v0.0.0-20221009204632-bfcf495c828d
