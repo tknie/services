@@ -5,7 +5,7 @@ go 1.21
 require (
 	github.com/coreos/go-oidc/v3 v3.11.0
 	github.com/fsnotify/fsnotify v1.8.0
-	github.com/go-ldap/ldap/v3 v3.4.9
+	github.com/go-ldap/ldap/v3 v3.4.10
 	github.com/go-openapi/errors v0.22.0
 	github.com/google/uuid v1.6.0
 	github.com/mitchellh/go-ps v1.0.0
