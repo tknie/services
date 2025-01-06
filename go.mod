@@ -3,7 +3,7 @@ module github.com/tknie/services
 go 1.21
 
 require (
-	github.com/coreos/go-oidc/v3 v3.11.0
+	github.com/coreos/go-oidc/v3 v3.12.0
 	github.com/fsnotify/fsnotify v1.8.0
 	github.com/go-ldap/ldap/v3 v3.4.10
 	github.com/go-openapi/errors v0.22.0
