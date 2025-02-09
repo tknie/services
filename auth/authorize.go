@@ -131,6 +131,9 @@ type Users struct {
 }
 
 var roleNames = []string{"Administrator", "User"}
+
+// PermissionPrefix permission group prefix used for different groups
+// and prefix characters
 var PermissionPrefix = []string{"#", "^", ">"}
 
 var userWatcher *fsnotify.Watcher
@@ -278,10 +281,9 @@ func checkUserRole(user, resource string, writeAccess bool) bool {
 			if writeAccess {
 				log.Log.Debugf("User write check user=%s read=%s write=%s resource=%s w=%v", user, us.Read, us.Write, resource, writeAccess)
 				return checkMapFits(user, resource, us.WriteMap)
-			} else {
-				log.Log.Debugf("User read check user=%s read=%s write=%s resource=%s", user, us.Read, us.Write, resource)
-				return checkMapFits(user, resource, us.ReadMap)
 			}
+			log.Log.Debugf("User read check user=%s read=%s write=%s resource=%s", user, us.Read, us.Write, resource)
+			return checkMapFits(user, resource, us.ReadMap)
 		}
 		log.Log.Debugf("Allowed user map return %v", us)
 	} else {
