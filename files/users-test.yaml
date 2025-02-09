@@ -26,7 +26,7 @@ default:
   write: ""
 user:
   - name: "tkn"
-    read: "*,!audit_data,#*"
+    read: "*,!audit_data,#*,^llllb"
     write: "Album,Picture"
   - name: "admin"
     read: "*,audit_data,#*"
@@ -34,6 +34,9 @@ user:
   - name: "writeUsers"
     read: "*,#*"
     write: "*,#*"
+  - name: "specificUser"
+    read: "^*,#*"
+    write: "^*,#*"
 role:
   name: "readUsers"
   read: "*,#*"
