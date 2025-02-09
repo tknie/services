@@ -66,8 +66,14 @@ func TestCheckUserWithJSON(t *testing.T) {
 }
 
 func TestCheckUserWithYAML(t *testing.T) {
+	err := initLog("auth.log")
+	if err != nil {
+		fmt.Println("ERROR : ", err)
+		return
+	}
+
 	ClearUsers()
-	err := LoadUsers(UserRole, "${CURDIR}/files/users-test.yaml")
+	err = LoadUsers(UserRole, "${CURDIR}/files/users-test.yaml")
 	assert.NoError(t, err)
 	err = LoadUsers(AdministratorRole, "${CURDIR}/files/administrators-test.yaml")
 	assert.NoError(t, err)
@@ -84,4 +90,24 @@ func TestCheckUserWithYAML(t *testing.T) {
 	assert.True(t, ValidAdmin("admin"))
 	assert.False(t, ValidAdmin("user1"))
 	assert.False(t, ValidAdmin(""))
+}
+
+func TestSpecificUserWithYAML(t *testing.T) {
+	PermissionPrefix = []string{"#", "^"}
+	err := initLog("auth.log")
+	if err != nil {
+		fmt.Println("ERROR : ", err)
+		return
+	}
+	ClearUsers()
+	err = LoadUsers(UserRole, "${CURDIR}/files/users-test.yaml")
+	assert.NoError(t, err)
+	err = LoadUsers(AdministratorRole, "${CURDIR}/files/administrators-test.yaml")
+	assert.NoError(t, err)
+	assert.False(t, ValidUser(UserRole, false, &UserInfo{User: "specificUser"}, ""))
+	assert.False(t, ValidUser(UserRole, false, &UserInfo{User: "tkn"}, "^abc"))
+	assert.True(t, ValidUser(UserRole, false, &UserInfo{User: "tkn"}, "^llllb"))
+	assert.True(t, ValidUser(UserRole, false, &UserInfo{User: "specificUser"}, "^abc"))
+	assert.False(t, ValidUser(UserRole, false, &UserInfo{User: "specificUser"}, "abc"))
+
 }

@@ -131,6 +131,7 @@ type Users struct {
 }
 
 var roleNames = []string{"Administrator", "User"}
+var PermissionPrefix = []string{"#", "^", ">"}
 
 var userWatcher *fsnotify.Watcher
 var adminWatcher *fsnotify.Watcher
@@ -262,7 +263,7 @@ func checkAdminstratorRole(user string) bool {
 // the given user. Dependent to the resource and write or read access
 // the configuration is checked.
 func checkUserRole(user, resource string, writeAccess bool) bool {
-	log.Log.Debugf("Validate user role: %s", user)
+	log.Log.Debugf("Validate user role: %s for resource %s (write=%v)", user, resource, writeAccess)
 	if AllowedUsers == nil {
 		log.Log.Debugf("No user set defined/enabled, valid user ...")
 		return true
@@ -275,56 +276,51 @@ func checkUserRole(user, resource string, writeAccess bool) bool {
 		if us != nil {
 			log.Log.Debugf("User map defined for %s", user)
 			if writeAccess {
-				log.Log.Debugf("User check user=%s read=%s write=%s resource=%s w=%v", user, us.Read, us.Write, resource, writeAccess)
-				if x, ok := us.WriteMap[resource]; ok {
-					log.Log.Debugf("Resource write set to %v", x)
-					return x
-				}
-				if x, ok := us.WriteMap["*"]; ok {
-					log.Log.Debugf("All user write set")
-					return x
-				}
-				log.Log.Debugf("Not found write map set")
+				log.Log.Debugf("User write check user=%s read=%s write=%s resource=%s w=%v", user, us.Read, us.Write, resource, writeAccess)
+				return checkMapFits(user, resource, us.WriteMap)
 			} else {
-				log.Log.Debugf("User check user=%s read=%s write=%s resource=%s", user, us.Read, us.Write, resource)
-				if x, ok := us.ReadMap[resource]; ok {
-					log.Log.Debugf("User map resource %s=%v", resource, us.ReadMap[resource])
-					return x
-				}
-				if x, ok := us.ReadMap["*"]; ok {
-					log.Log.Debugf("All read user set")
-					return x
-				}
-				log.Log.Debugf("Not found read map set")
+				log.Log.Debugf("User read check user=%s read=%s write=%s resource=%s", user, us.Read, us.Write, resource)
+				return checkMapFits(user, resource, us.ReadMap)
 			}
 		}
+		log.Log.Debugf("Allowed user map return %v", us)
 	} else {
 		log.Log.Debugf("Check default permissions")
 		if writeAccess {
-			if x, ok := AllowedUsers.Default.WriteMap[resource]; ok {
-				log.Log.Debugf("Map write user set (default) %v", x)
-				return x
-			}
-			if x, ok := AllowedUsers.Default.WriteMap["*"]; ok {
-				log.Log.Debugf("All write user set (default) for maps %v", ok)
-				return x
-			}
-		} else {
-			if AllowedUsers.Default == nil {
-				return false
-			}
-			log.Log.Debugf("Default check read=%s write=%s resource=%s", AllowedUsers.Default.Read, AllowedUsers.Default.Write, resource)
-			if x, ok := AllowedUsers.Default.ReadMap[resource]; ok {
-				log.Log.Debugf("Resource read user set (default) %v", x)
-				return x
-			}
-			if x, ok := AllowedUsers.Default.ReadMap["*"]; ok {
-				log.Log.Debugf("All read user set (default) %v", x)
-				return x
-			}
+			return checkMapFits(user, resource, AllowedUsers.Default.WriteMap)
 		}
+		if AllowedUsers.Default == nil {
+			return false
+		}
+		log.Log.Debugf("Default check read=%s write=%s resource=%s", AllowedUsers.Default.Read, AllowedUsers.Default.Write, resource)
+		return checkMapFits(user, resource, AllowedUsers.Default.ReadMap)
+
 	}
 	log.Log.Debugf("No user map validation %#v", AllowedUsers.UserMap)
+	return false
+}
+
+func checkMapFits(user, resource string, checkMap map[string]bool) bool {
+	log.Log.Debugf("Check user %s in resource %s of %v", user, resource, checkMap)
+	if x, ok := checkMap[resource]; ok {
+		log.Log.Debugf("User map resource %s=%v return=%v", resource, checkMap[resource], x)
+		return x
+	}
+
+	for _, p := range PermissionPrefix {
+		if strings.HasPrefix(resource, p) {
+			if x, ok := checkMap[p+"*"]; ok {
+				log.Log.Debugf("All user set for prefix " + p)
+				return x
+			}
+			return false
+		}
+	}
+	if x, ok := checkMap["*"]; ok {
+		log.Log.Debugf("All read user set")
+		return x
+	}
+	log.Log.Debugf("Not found read map set")
 	return false
 }
 
