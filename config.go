@@ -20,7 +20,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/fsnotify/fsnotify"
 	"github.com/tknie/log"
 )
 
@@ -32,9 +31,6 @@ var BuildVersion string
 
 // Version component version
 var Version string
-
-var watcher *fsnotify.Watcher
-var done chan bool
 
 var once sync.Once
 
@@ -53,6 +49,8 @@ const (
 	// JSONStoreType using JSON to store config
 	JSONStoreType
 )
+
+var configWatcher *ConfigFileWatcher
 
 // DefaultEnvironment default environment path
 var DefaultEnvironment = ""
@@ -82,7 +80,8 @@ type ConfigInterface interface {
 	IsServer() bool
 }
 
-func loadConfig(file string, config ConfigInterface) error {
+func loadConfig(file string, handler any) error {
+	config := handler.(ConfigInterface)
 	configLock.Lock()
 	defer configLock.Unlock()
 	log.Log.Debugf("Load config file: %s", file)
@@ -139,58 +138,6 @@ func ReadConfig(file string) ([]byte, error) {
 	return buffer.Bytes(), nil
 }
 
-// initWatcher initialize configuration file watcher checking modifications and
-// reload the configuration
-func initWatcher(fileName string, config ConfigInterface) (err error) {
-	watcher, err = fsnotify.NewWatcher()
-	if err != nil {
-		ServerMessage("ERROR creating watcher", err)
-	}
-	done = make(chan bool)
-	go func() {
-		for {
-			select {
-			// watch for events
-			case event := <-watcher.Events:
-				ServerMessage("Noticed configuration changed in %s (%v)", event.Name, event.Op)
-				saveConfig := config
-				err := loadConfig(event.Name, config)
-				if err != nil {
-					ServerMessage("Error re-loading configuration: %v", err)
-					// Wait for some seconds to retry it
-					time.Sleep(5 * time.Second)
-					if err := watcher.Add(fileName); err != nil {
-						log.Log.Infof("ERROR add watcher %s: %v", fileName, err)
-						return
-					}
-					err := loadConfig(event.Name, config)
-					if err != nil {
-						config = saveConfig
-					}
-				}
-				// watch for errors
-			case err := <-watcher.Errors:
-				ServerMessage("Watcher ERROR received: %v", err)
-			case <-done:
-				watcher.Close()
-				return
-			}
-		}
-	}()
-	// out of the box fsnotify can watch a single file, or a single directory
-	if err := watcher.Add(fileName); err != nil {
-		log.Log.Infof("ERROR add watcher %s: %v", fileName, err)
-	} else {
-		ServerMessage("Watcher enabled for %s", fileName)
-	}
-	return nil
-}
-
-// CloseConfig close configuration watcher and file descriptors
-func CloseConfig() {
-	done <- true
-}
-
 // StoreConfig store configuration
 func StoreConfig(file string, config ConfigInterface) error {
 	if config == nil {
@@ -234,15 +181,18 @@ func StoreConfig(file string, config ConfigInterface) error {
 }
 
 // LoadConfig load old XML configuration
-func LoadConfig(file string, config ConfigInterface, watch bool) error {
+func LoadConfig(file string, config ConfigInterface, watch bool) (err error) {
 	ActualConfigStoreType = evaluateConfigStore(file)
 
 	if watch {
-		initWatcher(file, config)
+		configWatcher, err = InitWatcher(file, config, loadConfig)
+		if err != nil {
+			ServerMessage("ERROR: Watcher failed to be activated: %v", err)
+		}
 	}
-	err := loadConfig(file, config)
+	err = loadConfig(file, config)
 	if err != nil {
-		err = fmt.Errorf("Config read error: " + err.Error())
+		err = fmt.Errorf("config read error: %v", err.Error())
 		return err
 	}
 	return nil

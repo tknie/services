@@ -21,9 +21,9 @@ import (
 
 func TestCheckUserWithXML(t *testing.T) {
 	ClearUsers()
-	err := LoadUsers(UserRole, "${CURDIR}/files/users-test.xml")
+	err := LoadUsers(UserRole, "${CURDIR}/files/users-test.xml", false)
 	assert.NoError(t, err)
-	err = LoadUsers(AdministratorRole, "${CURDIR}/files/administrators-test.xml")
+	err = LoadUsers(AdministratorRole, "${CURDIR}/files/administrators-test.xml", false)
 	assert.NoError(t, err)
 	assert.False(t, ValidUser(UserRole, false, nil, "abc"))
 	assert.False(t, ValidUser(UserRole, false, &UserInfo{}, "abc"))
@@ -42,13 +42,13 @@ func TestCheckUserWithXML(t *testing.T) {
 
 func TestCheckUserWithJSON(t *testing.T) {
 	ClearUsers()
-	users := Users{User: []*User{&User{Name: "abc"}}}
+	users := Users{User: []*User{{Name: "abc"}}}
 	v, _ := json.Marshal(users)
 	fmt.Println(">>>", string(v))
 
-	err := LoadUsers(UserRole, "${CURDIR}/files/users-test.json")
+	err := LoadUsers(UserRole, "${CURDIR}/files/users-test.json", false)
 	assert.NoError(t, err)
-	err = LoadUsers(AdministratorRole, "${CURDIR}/files/administrators-test.json")
+	err = LoadUsers(AdministratorRole, "${CURDIR}/files/administrators-test.json", false)
 	assert.NoError(t, err)
 	assert.False(t, ValidUser(UserRole, false, nil, "abc"))
 	assert.False(t, ValidUser(UserRole, false, &UserInfo{}, "abc"))
@@ -73,9 +73,9 @@ func TestCheckUserWithYAML(t *testing.T) {
 	}
 
 	ClearUsers()
-	err = LoadUsers(UserRole, "${CURDIR}/files/users-test.yaml")
+	err = LoadUsers(UserRole, "${CURDIR}/files/users-test.yaml", false)
 	assert.NoError(t, err)
-	err = LoadUsers(AdministratorRole, "${CURDIR}/files/administrators-test.yaml")
+	err = LoadUsers(AdministratorRole, "${CURDIR}/files/administrators-test.yaml", false)
 	assert.NoError(t, err)
 	assert.False(t, ValidUser(UserRole, false, nil, "abc"))
 	assert.False(t, ValidUser(UserRole, false, &UserInfo{}, "abc"))
@@ -100,9 +100,9 @@ func TestSpecificUserWithYAML(t *testing.T) {
 		return
 	}
 	ClearUsers()
-	err = LoadUsers(UserRole, "${CURDIR}/files/users-test.yaml")
+	err = LoadUsers(UserRole, "${CURDIR}/files/users-test.yaml", false)
 	assert.NoError(t, err)
-	err = LoadUsers(AdministratorRole, "${CURDIR}/files/administrators-test.yaml")
+	err = LoadUsers(AdministratorRole, "${CURDIR}/files/administrators-test.yaml", false)
 	assert.NoError(t, err)
 	assert.False(t, ValidUser(UserRole, false, &UserInfo{User: "specificUser"}, ""))
 	assert.False(t, ValidUser(UserRole, false, &UserInfo{User: "tkn"}, "^abc"))

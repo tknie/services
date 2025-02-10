@@ -59,6 +59,11 @@ const (
 	CallbackMethod
 )
 
+type watchLoader struct {
+	file string
+	role AccessRole
+}
+
 // MethodType parse method type out of string
 func MethodType(s string) Method {
 	t := strings.ToLower(strings.TrimSpace(s))
@@ -408,26 +413,35 @@ func loadUser(file string) (*Users, error) {
 }
 
 // LoadUsers load permission rights
-func LoadUsers(role AccessRole, file string) error {
+func LoadUsers(role AccessRole, file string, watcher bool) error {
 	if file == "" {
 		services.ServerMessage("Warning: %s access list not defined", role.name())
 		return nil
 	}
-	u, err := loadUser(file)
+	watchHandler := &watchLoader{file: file, role: role}
+	if watcher {
+		services.InitWatcher(file, watchHandler, loadUserWatcher)
+	}
+	return loadUserWatcher("init", watchHandler)
+}
+
+func loadUserWatcher(event string, handler any) error {
+	config := handler.(*watchLoader)
+	u, err := loadUser(config.file)
 	if err != nil {
 		return err
 	}
-	if role == AdministratorRole {
+	if config.role == AdministratorRole {
 		AllowedAdministrators = u
-		f := os.ExpandEnv(file)
+		f := os.ExpandEnv(config.file)
 		if err := adminWatcher.Add(f); err != nil {
-			services.ServerMessage("ERROR add admin watcher %s: %v", file, err)
+			services.ServerMessage("ERROR add admin watcher %s: %v", config.file, err)
 		}
 	} else {
 		AllowedUsers = u
-		f := os.ExpandEnv(file)
+		f := os.ExpandEnv(config.file)
 		if err := userWatcher.Add(f); err != nil {
-			services.ServerMessage("ERROR add user watcher %s: %v", file, err)
+			services.ServerMessage("ERROR add user watcher %s: %v", config.file, err)
 		}
 	}
 

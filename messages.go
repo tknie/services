@@ -71,7 +71,7 @@ func ServerMessage(msg string, args ...interface{}) {
 	d := time.Now().Format(TimeFormat)
 	outMsg := fmt.Sprintf(d+" "+msg, args...)
 	if OutputMessageMode {
-		fmt.Printf(outMsg + LineBreak)
+		fmt.Println(outMsg)
 	}
 	if i := strings.Index(outMsg, "password -> "); i > 0 {
 		i += 12

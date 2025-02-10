@@ -220,7 +220,7 @@ func parseRSAPublicKeyFromPEM(key []byte) (*rsa.PublicKey, error) {
 
 // InitWebTokenJose2 initialize WebToken Jose.v2 token
 func (webToken *WebToken) InitWebTokenJose2() error {
-	if webToken.OAuth2 == true {
+	if webToken.OAuth2 {
 		return webToken.InitWebTokenOIDC()
 	}
 	switch {
@@ -292,11 +292,7 @@ func (webToken *WebToken) GenerateJWToken(IAt string, principal PrincipalInterfa
 	}
 	claim.UUID = principal.UUID()
 	claim.ExpiresAt = jwt.NewNumericDate(time.Now().Add(sessionExpirerDuration))
-	if webToken != nil {
-		claim.Issuer = webToken.IssuerName
-	} else {
-		claim.Issuer = "Unknown"
-	}
+	claim.Issuer = webToken.IssuerName
 	claim.Remote = principal.Remote()
 	if webToken.Encrypt {
 		enc, err := jose.NewEncrypter(
@@ -417,13 +413,13 @@ func (webToken *WebToken) JWTContainsRoles(token string, scopes []string) (Princ
 				log.Log.Debugf("UUID %s not found for %s", claims.UUID, claims.ID)
 			}
 			services.ServerMessage("Token error, UUID %s token not found (%s/%s)", claims.UUID, issuer, claims.ID)
-			return nil, errors.New(http.StatusUnauthorized, "Unauthorized...token not found for "+claims.UUID+" / "+claims.ID)
+			return nil, errors.New(http.StatusUnauthorized, "unauthorized...token not found for %s/%s", claims.UUID, claims.ID)
 		}
 		if log.IsDebugLevel() {
 			log.Log.Debugf("Issuer error: %s != %s", claims.Issuer, issuer)
 		}
 		services.ServerMessage("Unauthorized token (Issuer error): %s (%s)", WebTokenConfig.IssuerName, claims.ID)
-		return nil, errors.New(http.StatusUnauthorized, "Unauthorized...issuer incorrect for "+claims.UUID+" / "+claims.ID)
+		return nil, errors.New(http.StatusUnauthorized, "unauthorized...issuer incorrect for %s/%s", claims.UUID, claims.ID)
 	}
 	if log.IsDebugLevel() {
 		log.Log.Debugf("Claim error")
