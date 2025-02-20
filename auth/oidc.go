@@ -95,6 +95,7 @@ func callbackOIDCAuthenticate(auth *AuthenticationServer, principal PrincipalInt
 	}
 	principal.SetRemote(auth.URL)
 	principal.SetSession(&SessionInfo{User: userName, UUID: uuid.New().String(), token: token})
+	log.Log.Debugf("User %s authenticate successfully using OIDC", userName)
 	return nil
 }
 
@@ -113,6 +114,7 @@ func (webToken *WebToken) generateOIDCToken(IAt string, principal PrincipalInter
 	if !ok {
 		return "", errors.New("token memory entry OIDC mismatch")
 	}
+	log.Log.Debugf("Access token: %s", token.AccessToken)
 	return token.AccessToken, nil
 }
 
@@ -146,6 +148,6 @@ func (webToken *WebToken) checkOIDCContainsRoles(token string, scopes []string) 
 	log.Log.Debugf("Claims %#v", claims)
 	p := PrincipalCreater(&SessionInfo{User: claims.EMail, UUID: uuid.New().String(), token: idToken},
 		claims.EMail, token)
-	log.Log.Debugf("Scope check %#v ignored", scopes)
+	log.Log.Debugf("Scope check %#v ignored, OIDC check ok", scopes)
 	return p, nil
 }

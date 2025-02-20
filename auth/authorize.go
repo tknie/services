@@ -408,6 +408,7 @@ func loadUser(file string) (*Users, error) {
 		for _, us := range u.User {
 			u.UserMap[us.Name] = us
 		}
+		log.Log.Debugf("User map %v", u.UserMap)
 	}
 	return u, nil
 }
