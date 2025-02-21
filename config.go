@@ -197,3 +197,7 @@ func LoadConfig(file string, config ConfigInterface, watch bool) (err error) {
 	}
 	return nil
 }
+
+func CloseConfig() {
+	configWatcher.CloseConfig()
+}

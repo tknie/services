@@ -73,5 +73,8 @@ func InitWatcher(fileName string, handler any, load func(string, any) error) (w 
 
 // CloseConfig close configuration watcher and file descriptors
 func (w *ConfigFileWatcher) CloseConfig() {
+	if w == nil {
+		return
+	}
 	w.done <- true
 }
