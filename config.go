@@ -198,6 +198,7 @@ func LoadConfig(file string, config ConfigInterface, watch bool) (err error) {
 	return nil
 }
 
+// CloseConfig close watcher and configuration file
 func CloseConfig() {
 	configWatcher.CloseConfig()
 }
