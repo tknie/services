@@ -5,7 +5,7 @@ go 1.24
 toolchain go1.24.1
 
 require (
-	github.com/coreos/go-oidc/v3 v3.14.1
+	github.com/coreos/go-oidc/v3 v3.15.0
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/go-ldap/ldap/v3 v3.4.11
 	github.com/go-openapi/errors v0.22.1
