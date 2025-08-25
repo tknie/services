@@ -11,7 +11,7 @@ require (
 	github.com/go-openapi/errors v0.22.2
 	github.com/google/uuid v1.6.0
 	github.com/mitchellh/go-ps v1.0.0
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.11.0
 	github.com/tknie/errorrepo v0.1.0
 	github.com/tknie/log v0.1.0
 	github.com/tknie/pam v0.0.0-20241226202719-7fe89c1216fb
