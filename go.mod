@@ -1,6 +1,6 @@
 module github.com/tknie/services
 
-go 1.24
+go 1.24.0
 
 toolchain go1.24.1
 
@@ -8,7 +8,7 @@ require (
 	github.com/coreos/go-oidc/v3 v3.15.0
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/go-ldap/ldap/v3 v3.4.11
-	github.com/go-openapi/errors v0.22.2
+	github.com/go-openapi/errors v0.22.3
 	github.com/google/uuid v1.6.0
 	github.com/mitchellh/go-ps v1.0.0
 	github.com/stretchr/testify v1.11.1
