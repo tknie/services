@@ -17,7 +17,7 @@ require (
 	github.com/tknie/pam v0.0.0-20241226202719-7fe89c1216fb
 	go.uber.org/zap v1.27.0
 	golang.org/x/oauth2 v0.31.0
-	golang.org/x/sys v0.36.0
+	golang.org/x/sys v0.38.0
 	golang.org/x/text v0.29.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
