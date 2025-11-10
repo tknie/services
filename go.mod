@@ -8,7 +8,7 @@ require (
 	github.com/coreos/go-oidc/v3 v3.16.0
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/go-ldap/ldap/v3 v3.4.12
-	github.com/go-openapi/errors v0.22.3
+	github.com/go-openapi/errors v0.22.4
 	github.com/google/uuid v1.6.0
 	github.com/mitchellh/go-ps v1.0.0
 	github.com/stretchr/testify v1.11.1
@@ -16,9 +16,9 @@ require (
 	github.com/tknie/log v0.1.0
 	github.com/tknie/pam v0.0.0-20241226202719-7fe89c1216fb
 	go.uber.org/zap v1.27.0
-	golang.org/x/oauth2 v0.31.0
-	golang.org/x/sys v0.36.0
-	golang.org/x/text v0.29.0
+	golang.org/x/oauth2 v0.33.0
+	golang.org/x/sys v0.38.0
+	golang.org/x/text v0.30.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
 
@@ -32,7 +32,7 @@ require (
 )
 
 require (
-	github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358 // indirect
+	github.com/Azure/go-ntlmssp v0.0.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-asn1-ber/asn1-ber v1.5.8-0.20250403174932-29230038a667 // indirect
 	github.com/go-jose/go-jose/v4 v4.1.3
@@ -40,6 +40,6 @@ require (
 	github.com/jackc/pgx/v5 v5.7.6
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/crypto v0.42.0 // indirect
+	golang.org/x/crypto v0.43.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1
 )
