@@ -8,7 +8,7 @@ require (
 	github.com/coreos/go-oidc/v3 v3.17.0
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/go-ldap/ldap/v3 v3.4.12
-	github.com/go-openapi/errors v0.22.4
+	github.com/go-openapi/errors v0.22.5
 	github.com/google/uuid v1.6.0
 	github.com/mitchellh/go-ps v1.0.0
 	github.com/stretchr/testify v1.11.1
