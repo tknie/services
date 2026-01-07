@@ -17,6 +17,7 @@ import (
 	"crypto/sha1"
 	"crypto/sha256"
 	"crypto/sha512"
+	"crypto/pbkdf2"
 	"errors"
 	"fmt"
 	"os"
@@ -425,21 +426,32 @@ func (rfs *PasswordFileStruct) callPasswordFileUserAuthenticate(u, password stri
 func GenerateHash(enc, password string) string {
 	switch strings.ToUpper(enc) {
 	case "MD5":
+		// NOTE: MD5 is considered cryptographically broken and should not be used
 		h := md5.New()
 		h.Write([]byte(password))
 		return fmt.Sprintf("%x", h.Sum(nil))
 	case "SHA":
+		// NOTE: SHA-1 is considered cryptographically broken and should not be used
 		h := sha1.New()
 		h.Write([]byte(password))
 		return fmt.Sprintf("%x", h.Sum(nil))
 	case "SHA256":
-		h := sha256.New()
-		h.Write([]byte(password))
-		return fmt.Sprintf("%x", h.Sum(nil))
+		// Use PBKDF2 with SHA-256 to derive a password hash instead of a single fast hash
+		// Fixed parameters to keep return type and comparison behavior unchanged
+		const iter = 100000
+		const keyLen = 32
+		// WARNING: For best security, a per-password random salt should be used and stored
+		salt := []byte("static-salt-sha256")
+		derived := pbkdf2.Key([]byte(password), salt, iter, keyLen, sha256.New)
+		return fmt.Sprintf("%x", derived)
 	case "SHA512":
-		h := sha512.New()
-		h.Write([]byte(password))
-		return fmt.Sprintf("%x", h.Sum(nil))
+		// Use PBKDF2 with SHA-512 to derive a password hash instead of a single fast hash
+		const iter = 100000
+		const keyLen = 64
+		// WARNING: For best security, a per-password random salt should be used and stored
+		salt := []byte("static-salt-sha512")
+		derived := pbkdf2.Key([]byte(password), salt, iter, keyLen, sha512.New)
+		return fmt.Sprintf("%x", derived)
 	default:
 	}
 	return password
