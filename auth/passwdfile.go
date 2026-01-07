@@ -14,6 +14,7 @@ package auth
 import (
 	"bufio"
 	"crypto/md5"
+	"crypto/pbkdf2"
 	"crypto/sha1"
 	"crypto/sha256"
 	"crypto/sha512"
@@ -37,6 +38,8 @@ const CheckDefaultPassword = "Test123"
 const realmHeader = `# Create MD5 hash with
 # echo -n "<password>" | md5sum
 # on Unix`
+
+const salt = "my-generic-static-salt"
 
 type loginEntry struct {
 	user     string
@@ -425,10 +428,12 @@ func (rfs *PasswordFileStruct) callPasswordFileUserAuthenticate(u, password stri
 func GenerateHash(enc, password string) string {
 	switch strings.ToUpper(enc) {
 	case "MD5":
+		// NOTE: MD5 is considered cryptographically broken and should not be used
 		h := md5.New()
 		h.Write([]byte(password))
 		return fmt.Sprintf("%x", h.Sum(nil))
 	case "SHA":
+		// NOTE: SHA-1 is considered cryptographically broken and should not be used
 		h := sha1.New()
 		h.Write([]byte(password))
 		return fmt.Sprintf("%x", h.Sum(nil))
@@ -436,10 +441,35 @@ func GenerateHash(enc, password string) string {
 		h := sha256.New()
 		h.Write([]byte(password))
 		return fmt.Sprintf("%x", h.Sum(nil))
+	case "SHA256SECURE":
+		// Use PBKDF2 with SHA-256 to derive a password hash instead of a single fast hash
+		// Fixed parameters to keep return type and comparison behavior unchanged
+		const iter = 100000
+		const keyLen = 32
+		// WARNING: For best security, a per-password random salt should be used and stored
+		derived, err := pbkdf2.Key(sha256.New, password, []byte(salt), iter, keyLen)
+		if err != nil {
+			h := sha256.New()
+			h.Write([]byte(password))
+			return fmt.Sprintf("%x", h.Sum(nil))
+		}
+		return fmt.Sprintf("%x", derived)
 	case "SHA512":
 		h := sha512.New()
 		h.Write([]byte(password))
 		return fmt.Sprintf("%x", h.Sum(nil))
+	case "SHA512SECURE":
+		// Use PBKDF2 with SHA-512 to derive a password hash instead of a single fast hash
+		const iter = 100000
+		const keyLen = 64
+		// WARNING: For best security, a per-password random salt should be used and stored
+		derived, err := pbkdf2.Key(sha512.New, password, []byte(salt), iter, keyLen)
+		if err != nil {
+			h := sha512.New()
+			h.Write([]byte(password))
+			return fmt.Sprintf("%x", h.Sum(nil))
+		}
+		return fmt.Sprintf("%x", derived)
 	default:
 	}
 	return password
