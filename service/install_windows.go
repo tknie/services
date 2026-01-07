@@ -2,7 +2,7 @@
 // +build windows
 
 /*
-* Copyright 2022-2024 Thorsten A. Knieling
+* Copyright 2022-2026 Thorsten A. Knieling
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/tknie/log"
+	"github.com/tknie/services"
 	"golang.org/x/sys/windows/svc"
 	"golang.org/x/sys/windows/svc/eventlog"
 	"golang.org/x/sys/windows/svc/mgr"
