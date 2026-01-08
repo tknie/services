@@ -357,6 +357,11 @@ func loadUser(file string) (*Users, error) {
 	fileEnvResolved := os.ExpandEnv(file)
 
 	ext := strings.ToLower(filepath.Ext(file))
+	if _, err := os.Stat(fileEnvResolved); err != nil {
+		if os.IsNotExist(err) {
+			return nil, err
+		}
+	}
 
 	data, err := services.ReadConfig(fileEnvResolved)
 	if err != nil {
