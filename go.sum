@@ -57,8 +57,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/rogpeppe/go-internal v1.9.0 h1:73kH8U+JUqXU8lRuOHeVHaa/SZPifC7BkcraZVejAe8=
 github.com/rogpeppe/go-internal v1.9.0/go.mod h1:WtVeX8xhTBvf0smdhujwtBcq4Qrzq/fJaraNFVN+nFs=
-github.com/sirupsen/logrus v1.9.0 h1:trlNQbNUG3OdDrDil03MCb1H2o9nJ1x4/5LYw7byDE0=
-github.com/sirupsen/logrus v1.9.0/go.mod h1:naHLuLoDiP4jHNo9R0sCBMtWGeIprob74mVsIT4qYEQ=
+github.com/sirupsen/logrus v1.9.1 h1:Ou41VVR3nMWWmTiEUnj0OlsgOSCUFgsPAOl6jRIcVtQ=
+github.com/sirupsen/logrus v1.9.1/go.mod h1:naHLuLoDiP4jHNo9R0sCBMtWGeIprob74mVsIT4qYEQ=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
@@ -66,8 +66,8 @@ github.com/stretchr/testify v1.11.1 h1:7s2iGBzp5EwR7/aIZr8ao5+dra3wiQyKjjFuvgVKu
 github.com/stretchr/testify v1.11.1/go.mod h1:wZwfW3scLgRK+23gO65QZefKpKQRnfz6sD981Nm4B6U=
 github.com/tknie/errorrepo v0.1.0 h1:pOt79EWL4P4UjPzXknNcdAr01fjgF38XY1u1ZzHttqo=
 github.com/tknie/errorrepo v0.1.0/go.mod h1:K4bEhPce5B7ybIptX2D2mpRfjWehStjeUG1fiegwoq0=
-github.com/tknie/log v0.1.0 h1:MrYiDgntQvXm1H0kjJZnz+AI7dB9KbhVYpcohRnAfvU=
-github.com/tknie/log v0.1.0/go.mod h1:W67unT0xxqTLc9tyxpdV1lED/JuD0veFgxT/astdxt4=
+github.com/tknie/log v0.4.0 h1:dDk1F1raRK8k1eMOjt8X23oGLsbYGMMpIiicbIhyAUc=
+github.com/tknie/log v0.4.0/go.mod h1:UKCtV8Q9CdW6x/B9iJwxdMoefZ7NcrPfMSVNmSbj0z0=
 github.com/tknie/pam v0.0.0-20241226202719-7fe89c1216fb h1:mOrOvaroDXI22EpXU09h7odvawvf3IQQ1Mtr2BiNvDQ=
 github.com/tknie/pam v0.0.0-20241226202719-7fe89c1216fb/go.mod h1:aDjuEgcUenpqcsmJjVqaef1SfOQj7aGEwozcCeZ09eY=
 go.uber.org/goleak v1.3.0 h1:2K3zAYmnTNqV73imy9J1T3WC+gmCePx2hEGkimedGto=
