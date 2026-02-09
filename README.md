@@ -37,3 +37,7 @@ err:=DeletePidFile("file.pid)
   * [Open] First OpenID implementation started
   * Database authentication (send user authentication to database)
 * JSON Web token creation and validation certification dependent tokens
+
+## Documentation
+
+API documentation can be read at [github doc](https://pkg.go.dev/github.com/tknie/services#section-readme).
