@@ -13,17 +13,17 @@ require (
 	github.com/mitchellh/go-ps v1.0.0
 	github.com/stretchr/testify v1.11.1
 	github.com/tknie/errorrepo v0.1.0
-	github.com/tknie/log v0.1.0
+	github.com/tknie/log v0.4.0
 	github.com/tknie/pam v0.0.0-20241226202719-7fe89c1216fb
 	go.uber.org/zap v1.27.1
-	golang.org/x/oauth2 v0.34.0
+	golang.org/x/oauth2 v0.35.0
 	golang.org/x/sys v0.41.0
-	golang.org/x/text v0.32.0
+	golang.org/x/text v0.34.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
 
 require (
-	filippo.io/edwards25519 v1.1.0 // indirect
+	filippo.io/edwards25519 v1.1.1 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
@@ -40,6 +40,6 @@ require (
 	github.com/jackc/pgx/v5 v5.8.0
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/crypto v0.46.0 // indirect
+	golang.org/x/crypto v0.48.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1
 )
