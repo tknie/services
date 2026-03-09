@@ -1,8 +1,6 @@
 module github.com/tknie/services
 
-go 1.24.0
-
-toolchain go1.24.1
+go 1.25.0
 
 require (
 	github.com/coreos/go-oidc/v3 v3.17.0
@@ -16,7 +14,7 @@ require (
 	github.com/tknie/log v0.4.0
 	github.com/tknie/pam v0.0.0-20241226202719-7fe89c1216fb
 	go.uber.org/zap v1.27.1
-	golang.org/x/oauth2 v0.35.0
+	golang.org/x/oauth2 v0.36.0
 	golang.org/x/sys v0.41.0
 	golang.org/x/text v0.34.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
