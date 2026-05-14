@@ -77,7 +77,7 @@ func ServerMessage(msg string, args ...interface{}) {
 		i += 12
 		outMsg = outMsg[:i] + "**********"
 	}
-	log.Log.Debugf(outMsg)
+	log.Log.Infof(outMsg)
 	if EnableLogCache {
 		if serverLog.serverLogFile == nil {
 			if tmpBuffer == nil {
