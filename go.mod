@@ -17,7 +17,7 @@ require (
 	go.uber.org/zap v1.28.0
 	golang.org/x/oauth2 v0.36.0
 	golang.org/x/sys v0.45.0
-	golang.org/x/text v0.37.0
+	golang.org/x/text v0.38.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
 
@@ -27,7 +27,7 @@ require (
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/rogpeppe/go-internal v1.9.0 // indirect
-	golang.org/x/sync v0.20.0 // indirect
+	golang.org/x/sync v0.21.0 // indirect
 )
 
 require (
