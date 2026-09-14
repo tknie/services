@@ -1,6 +1,6 @@
 module github.com/tknie/services
 
-go 1.25.0
+go 1.26.0
 
 require (
 	github.com/coreos/go-oidc/v3 v3.20.0
@@ -17,7 +17,7 @@ require (
 	go.uber.org/zap v1.28.0
 	golang.org/x/oauth2 v0.36.0
 	golang.org/x/sys v0.47.0
-	golang.org/x/text v0.40.0
+	golang.org/x/text v0.42.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
 
@@ -27,7 +27,7 @@ require (
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/rogpeppe/go-internal v1.9.0 // indirect
-	golang.org/x/sync v0.22.0 // indirect
+	golang.org/x/sync v0.23.0 // indirect
 )
 
 require (
