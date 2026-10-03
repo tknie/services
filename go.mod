@@ -6,8 +6,8 @@ require (
 	github.com/coreos/go-oidc/v3 v3.21.0
 	github.com/fsnotify/fsnotify v1.10.1
 	github.com/go-ldap/ldap/v3 v3.4.14
-	github.com/go-openapi/errors v0.22.8
-	github.com/go-sql-driver/mysql v1.10.0
+	github.com/go-openapi/errors v0.22.9
+	github.com/go-sql-driver/mysql v1.10.1
 	github.com/google/uuid v1.6.0
 	github.com/mitchellh/go-ps v1.0.0
 	github.com/stretchr/testify v1.12.1
@@ -35,7 +35,8 @@ require (
 	github.com/Azure/go-ntlmssp v0.1.1 // indirect
 	github.com/go-asn1-ber/asn1-ber v1.5.8 // indirect
 	github.com/go-jose/go-jose/v4 v4.1.5
-	github.com/jackc/pgx/v5 v5.10.0
+	github.com/jackc/pgx/v5 v5.11.0
+	github.com/pmezard/go-difflib v1.0.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/crypto v0.57.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1
